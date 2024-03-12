@@ -12,9 +12,9 @@ class TagController extends Controller
     public function index(){
     $tags=Tag::select('id','name','slug')->with([
         'posts' => function ($query) {
-            $query->select( 'title', 'slug');
+            $query->select( 'title', 'slug','image');
         }
-    ])->get();
+    ])->latest()->get();
     if($tags){
         return response()->json([
             'success'=>true,
@@ -31,18 +31,17 @@ class TagController extends Controller
     }
 }
     public function show(string $slug){
-        $tag=Tag::where('slug',$slug)->first()->select('id', 'name', 'slug')->with([
+        $tag=Tag::where('slug',$slug)->select('id', 'name', 'slug')->with([
             'posts' => function ($query) {
-                $query->select( 'title', 'slug', 'author_id','image');
+                $query->select( 'title', 'slug', 'author_id','image')->latest();
             }
-        ])->get();
+        ])->get()->first();
         if($tag){
            return response()->json([
                'success'=>true,
                'status'=>200,
                'data'=>[
-                   'tag'=>$tag,
-                  
+                   'tag'=>$tag,   
                ]
            ],200);
         }

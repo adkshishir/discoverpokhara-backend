@@ -12,14 +12,12 @@ use function Laravel\Prompts\select;
 class MenuController extends Controller
 {
     public function index(){
-        $posts =Category::select('id','name','slug')->with(['posts'=>function($query){
-            $query->select('title','slug','author_id','image');
-        }])->get();
+        $posts=Post::select('title','slug','image')->latest()->paginate(13);
         if($posts){
             return response()->json([
                 'success'=>true,
                 'status'=>200,
-                'data'=>$posts
+                'posts'=>$posts
             ],200);
         }
         else{

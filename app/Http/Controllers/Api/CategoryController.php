@@ -16,9 +16,9 @@ class CategoryController extends Controller
     
     $categories = Category::select('id', 'name', 'slug')
     ->with(['posts' => function ($query) {
-        $query->select( 'title', 'slug');
+        $query->select( 'title', 'slug','image')->get();
     }])
-    ->get();
+    ->latest()->get();
     if($categories){
         return response()->json([
             'success'=>true,
@@ -43,9 +43,9 @@ class CategoryController extends Controller
    }
 }
 public function show(string $slug){
-         $category=Category::where('slug',$slug)->first()->with(['posts'=>function($query){
+         $category=Category::where('slug',$slug)->with(['posts'=>function($query){
              $query->select('title','slug','author_id','image');
-         }])->get();
+         }])->get()->first();
          if($category){
             return response()->json([
                 'success'=>true,
