@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\PostCategory;
+use App\Models\Seo;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -46,13 +47,15 @@ public function show(string $slug){
          $category=Category::where('slug',$slug)->with(['posts'=>function($query){
              $query->select('title','slug','author_id','image');
          }])->get()->first();
+         $seo=Seo::where('parent_id',$category->id)->where('seo_type','category')->select('meta_title','meta_description','meta_keywords','schema')->first();
+
          if($category){
             return response()->json([
                 'success'=>true,
                 'status'=>200,
                 'data'=>[
-                    'category'=>$category,
-                   
+                    'seo'=>$seo,
+                    'category'=>$category
                 ]
             ],200);
          }

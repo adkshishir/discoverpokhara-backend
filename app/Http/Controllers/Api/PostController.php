@@ -36,7 +36,7 @@ class PostController extends Controller
         $seo=Seo::where('parent_id',$post->id)->where('seo_type','post')->first();
         $author=Author::where('id',$post->author_id)->select('id', 'name', 'avatar')->first();
         $relatedPost=Post::where('id','!=',$post->id)->where('author_id',$post->author_id)->latest()->take(7)->select('id','title','slug','image')->get();
-        // dd($relatedPost);
+        
         if(!$post){
             return response()->json([
                 'success'=>false,
