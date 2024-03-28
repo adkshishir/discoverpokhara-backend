@@ -12,7 +12,7 @@ class Image extends Model
        'name',
        "parent_id",
        "parent_type",
-      'alt',
+        'alt',
        
 
    ];

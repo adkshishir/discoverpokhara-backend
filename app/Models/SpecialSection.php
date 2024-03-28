@@ -5,23 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Author extends Model
+class SpecialSection extends BaseModel
 {
     use HasFactory;
     protected $fillable = [
         'name',
-        'bio',
-        'avatar',
-        'user_id'
+        'description',
+        'url',
+        'content_id',
     ];
-
-    public function posts()
-    {
-        return $this->hasMany(Post::class);
+    public function content(){
+        return $this->belongsTo(Content::class);
     }
     public function getImageUrlAttribute()
     {
         return $this->getFile();
     }
-
 }

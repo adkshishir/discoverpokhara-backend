@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,6 +20,9 @@ class TagFactory extends Factory
         return [
             'name' => $this->faker->word(),
             'slug' => $this->faker->slug(),
+            'image' => $this->faker->imageUrl(),
+            'description' => $this->faker->text(),
+            'category_id' => Category::all()->random()->id
         ];
     }
 }

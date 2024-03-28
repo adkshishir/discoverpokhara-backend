@@ -1,80 +1,100 @@
-
-
-
 @extends('layouts.app')
 
-@section('title', 'Create Category')
-@section('header', 'Category')
+@section('title', 'Create Posts')
+@section('header', 'Post')
 @section('content')
 
 <div class="container h-full w-full">
-    <div class="container pt-5 rounded ">
-        {{dd($post,$seo,$categories,$tags)}}
-        <form class="pt-5 rounded form bg-white p-3" enctype="multipart/form-data" action="{{route('posts.update', $post->id,)}}"
-            method="POST">
+    <div class="container  pt-5 rounded ">
+        <div class="btn-group m-2 p-2 gap-2 bg-white">
+            <button onclick="showGeneral()" class="btn btn-primary">General</button>
+            <button onclick="showSeo()" class="btn btn-primary">SEO</button>
+        </div>
+        @php
+
+
+        @endphp
+        
+        <form class="pt-5 rounded form bg-white p-3" enctype="multipart/form-data" 
+            action="{{ route('posts.update', $post) }}"
+             method="POST" >
             @csrf
-            <h3>SEO</h3>`
-            <div class="row">
+            @method('PUT')
+            <div id="seo" class="row">
+                <h3 class="col-md-12">SEO</h3>
                 <div class="col-md-6">
-                    <x-adminlte-input value="{{$seo->meta_title }}" name="meta_title" label="Meta Title"
-                        placeholder="Enter meta title" fgroup-class="" disable-feedback />
-                    @if($errors->has('meta_title'))
-                    <div class="text-danger">{{ $errors->first('meta_title') }}</div>
-                    @endif
+                    <x-adminlte-input id="meta_title" value="{{$post->seo->meta_title }}" name="meta_title"
+                        label="Meta Title" placeholder="Enter meta title" fgroup-class="" />
                 </div>
                 <div class="col-md-6">
-                    <x-adminlte-input value="{{ old('meta_description') }}" name="meta_description"
-                        label="Meta Description" placeholder="Enter meta description" fgroup-class=""
-                        disable-feedback />
-                    @if($errors->has('meta_description'))
-                    <div class="text-danger">{{ $errors->first('meta_description') }}</div>
-                    @endif
+                    <x-adminlte-input value="{{ $post->seo->meta_description }}" name="meta_description"
+                        label="Meta Description" placeholder="Enter meta description" fgroup-class="" />
+
                 </div>
-                <div class="col-md-12">
-                    <x-adminlte-input value="{{ old('meta_keywords') }}" name="meta_keywords" label="Meta Keywords"
-                        placeholder="Enter meta keywords" fgroup-class="" disable-feedback />
-                    @if($errors->has('meta_keywords'))
-                    <div class="text-danger">{{ $errors->first('meta_keywords') }}</div>
-                    @endif
+                <div class="col-md-6">
+                    <x-adminlte-input value="{{ $post->seo->meta_keywords }}" name="meta_keywords" label="Meta Keywords"
+                        placeholder="Enter meta keywords" fgroup-class="" />
                 </div>
+                <div class="col-md-6">
+                    <x-adminlte-input value="{{ $post->seo->cannonical_url }}" name="cannonical_url" label="Cannonical Url"
+                      placeholder="Enter cannonical Url" fgroup-class="" />
+                  </div>
                 <div class="col-md-12">
                     @php
 
                     @endphp
-                    <x-adminlte-textarea name="schema" rows="5" label="Schema" value="{{old('schema')}}"
-                        placeholder="Write Schema..." />
+                    <x-adminlte-textarea name="schema" rows="5" label="Schema"
+                        placeholder="Write Schema...">{{ $post->seo->schema }}</x-adminlte-textarea>
                     @if($errors->has('schema'))
                     <div class="text-danger">{{ $errors->first('schema') }}</div>
                     @endif
 
                 </div>
             </div>
-            <div class="row">
+            <div id="general" class="row">
+                <h3 class="col-md-12">General</h3>
+
                 <div class="col-md-6">
-                    <x-adminlte-input value="{{ old('title') }}" name="title" label="Name" placeholder="Enter Title"
-                        fgroup-class="" disable-feedback />
-                    @if($errors->has('title'))
-                    <div class="text-danger">{{ $errors->first('title') }}</div>
-                    @endif
+                    <x-adminlte-input value="{{ $post->title }}" name="title" label="Name" placeholder="Enter Title"
+                        fgroup-class="" />
+
                 </div>
                 <div class="col-md-6">
-                    <x-adminlte-input value="{{ old('slug') }}" name="slug" label="Slug" placeholder="Slug..."
-                        fgroup-class="" disable-feedback />
-                    @if($errors->has('slug'))
-                    <div class="text-danger">{{ $errors->first('slug') }}</div>
-                    @endif
+                    <x-adminlte-input value="{{ $post->slug }}" name="slug" label="Slug" placeholder="Slug..."
+                        fgroup-class="" />
+
                 </div>
-                    @php
-                    $config = [
-                    "placeholder" => "Select multiple options...",
-                    "allowClear" => true,
-                    
-                    ];
-                    @endphp
+                @php
+                $config = [
+                "placeholder" => "Select multiple options...",
+                "allowClear" => true,
+
+                ];
+                @endphp
                 <div class="col-md-6">
-                    <x-adminlte-select2  id="category" name="categories[]" label="Categories"
-                        label-class="" igroup-size="sm" :config="$config" multiple>
-                        <x-slot  name="prependSlot">
+                    <x-adminlte-select2 id="Tag" name="category_id" label="Category" label-class="" igroup-size="sm"
+                        :config="$config">
+                        <x-slot name="prependSlot">
+                            <div class="input-group-text bg-primary">
+                                <i class="fas fa-tag"></i>
+                            </div>
+                        </x-slot>
+                        {{-- <x-slot name="appendSlot">
+                            <x-adminlte-button theme="outline-dark" label="Clear" icon="fas fa-lg fa-ban text-danger" />
+                        </x-slot> --}}
+                        
+                        @isset($categories)
+                        @foreach($categories as $id=>$value)
+                        <option value="{{ $id}}">{{ $value }}</option>
+                        @endforeach
+                        @endisset
+
+                    </x-adminlte-select2>
+                </div>
+                <div class="col-md-6">
+                    <x-adminlte-select2 id="tags" name="tags[]" label="Tags" label-class="" igroup-size="sm"
+                        :config="$config" multiple>
+                        <x-slot name="prependSlot">
                             <div class="input-group-text bg-primary">
                                 <i class="fas fa-tag"></i>
                             </div>
@@ -82,34 +102,13 @@
                         <x-slot name="appendSlot">
                             <x-adminlte-button theme="outline-dark" label="Clear" icon="fas fa-lg fa-ban text-danger" />
                         </x-slot>
-                        @isset($categories)
-                       @foreach($categories as $id=>$value)
+                        @isset($tags)
+                        @foreach($tags as $id=>$value)
                         <option value="{{ $id}}">{{ $value }}</option>
                         @endforeach
                         @endisset
-                    
                     </x-adminlte-select2>
                 </div>
-                <div class="col-md-6">
-                    <x-adminlte-select2  id="tags" name="tags[]" label="Tags"
-                    label-class="" igroup-size="sm" :config="$config" multiple>
-                    <x-slot  name="prependSlot">
-                        <div class="input-group-text bg-primary">
-                            <i class="fas fa-tag"></i>
-                        </div>
-                    </x-slot>
-                    <x-slot name="appendSlot">
-                        <x-adminlte-button theme="outline-dark" label="Clear" icon="fas fa-lg fa-ban text-danger" />
-                    </x-slot>
-                    @isset($tags)
-                   @foreach($tags as $id=>$value)
-                    <option value="{{ $id}}">{{ $value }}</option>
-                    @endforeach
-                    @endisset
-                
-                </x-adminlte-select2>
-                </div>
-               
                 <div class="col-md-12">
                     @php
                     $config = [
@@ -128,16 +127,56 @@
                     ],
                     ]
                     @endphp
-                    <x-adminlte-text-editor name="content" label="WYSIWYG Editor" label-class="" igroup-size="sm"
-                        placeholder="Main Content..." :config="$config" />
+                    
+                    <div class="container-fluid  w-full">
+                        @foreach($post->contents as $key=>$content)
+                        <div class="form-group w-full">
+                            <x-adminlte-input class="col-12" name='heads[]' label="Header" placeholder="Enter header" value="{{ $content->title }}" />
+                            <x-adminlte-text-editor class="col-12" id="content{{$key}}" name="contents[]" rows='7' label="Content" label-class=""
+                                igroup-size="sm" placeholder="Main Content..." :config="$config" >{{ $content->content }}</x-adminlte-text-editor>
+                        </div>
+                        
+                        {{-- special section start --}}
+                      
+                        @isset($content->special_sections)
+                        @foreach($content->special_sections as $sectionIndex=>$section)
+
+                        <div class="container border rounded p-3 m-2 col-md-5 mx-auto bg-secondary  special-section-box">
+                            <x-adminlte-input class="col-12" name="section_header[${sectionIndex}][]" label="Header"
+                                placeholder="Enter section header" />
+                            <x-adminlte-input class="col-12" name="section_description[${sectionIndex}][]" label="Description"
+                                placeholder="Enter section description" />
+                            <x-adminlte-input class="col-12" name="section_url[${sectionIndex}][]" label="Url"
+                                placeholder="Enter section Url" />
+                                
+                            <x-adminlte-input type="file" class="col-12" name='section_image[${sectionIndex}][]'
+                                label="Section Image" placeholder="Enter section Image" />
+                                <button type="button" class="btn btn-danger float-right remove-section">Remove Section</button>
+                        </div>
+                          @endforeach
+                          @endisset
+                        {{-- special section end --}}
+                        @endforeach
+                        
+                        <div id="section" class="w-100 row container m-5 rounded p-2 mx-auto special-section"
+                            style="background-color: aliceblue">
+                            <h3 class="col-12">Special Section</h3>
+                            <button type="button" id="add-section" class="btn col-12  add-section">
+                                <span class="btn btn-primary">Add Section</span></button>
+                        </div>
+                        <button id="add-more" class="col-2 float-right btn btn-primary add-more mx-2 " type="button">Add More</button>
+                    </div>  
 
                 </div>
+                {{-- {{dd($image->getUrl())}} --}}
 
                 <div class="col-md-12">
                     {{-- With label and feedback disabled --}}
+                    <img src={{$image->getUrl()}} alt="this is iamge" id="imagepreview" class="w-25">
                     <div>
-                        <label for="image" class="form-label">Large file input example</label>
-                        <input class="form-control form-control-lg" id="image" type="file" value="{{ old('image') }}"
+                    
+                        <label for="image" class="form-label">Image</label>
+                        <input class="form-control form-control-lg" value="{{ $image->getUrl() }}" id="image" type="file" placeholder=""
                             name="image">
                     </div>
                     {{--
@@ -150,9 +189,83 @@
 
             </div>
 
-            <x-adminlte-button class="btn-flat  mt-4" type="submit" label="Submit" theme="success"
-                icon="fas fa-lg fa-save " />
+            <x-adminlte-button id="submit-button" class="btn-flat rounded mt-4" type="submit" label="Submit"
+                theme="success" icon="fas fa-lg fa-save " />
         </form>
     </div>
 </div>
 @endsection
+
+@push('js')
+
+<script>
+    let contentSection=[]
+    $(document).ready(function() {
+     $('#submit-button').text('Next')
+    })
+  function showGeneral(){
+    $('#general').css({display:'flex'});
+    $('#seo').css({display:'none'});
+  }
+  function showSeo(){
+    $('#seo').css({display:'flex'});
+    $('#general').css({display:'none'});
+  }
+  $(document).ready(function() {
+    $('#general').css({display:'flex'});
+    $('#seo').css({display:'none'});
+   
+    let count=1
+    $(document).on('click', '.add-more', function() {
+        count=count+1
+    let inputGroup = `
+            <div class="form-group w-full">
+                <x-adminlte-input class="col-12" name='heads[]' label="Header" placeholder="Enter header" />
+                <x-adminlte-text-editor class="col-12" id="content${count}" name="contents[]" rows='7' label="Content" label-class=""
+                    igroup-size="sm" placeholder="Main Content..." :config="$config" />
+                    <button type="button" class="btn btn-danger remove-input">Remove</button>
+                </div>
+            `
+
+            $('#add-more').before(inputGroup);
+                // Apply configuration to the newly added text editor
+                let newEditorConfig = {
+                    "height": "300",
+                    "width": "100%",
+                    "toolbar": [
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['font', ['strikethrough', 'superscript', 'subscript']],
+                        ['fontsize', ['fontsize']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['height', ['height']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture', 'video']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                    ]
+                };
+                $('#content' + count).summernote(newEditorConfig); // Assuming summernote is used as the text editor
+          });
+     });
+    $(document).on('click', '.remove-input', function() {
+        $(this).closest('.container-fluid').remove();
+    });
+
+     
+// track submit button before submit
+$(document).on('submit', 'form', function(e) {
+    if(document.getElementById("seo").style.display === "none"){
+        e.preventDefault(); 
+        document.getElementById("general").style.display = "none";
+         document.getElementById("seo").style.display = "flex";
+         $('#submit-button').text('Submit')
+         return false
+      }
+});
+
+
+
+</script>
+
+
+@endpush

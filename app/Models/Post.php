@@ -5,18 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Post extends Model
+class Post extends BaseModel
 {
     use HasFactory;
     protected $fillable = [
         'title',
-        'content',
-        'image',
         'author_id',
         'publication_date',
-        'slug'
+        'slug',
+        'category_id',
     ];
     // set publication date automatically
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        return $this->getFile();
+    }
 
     public function author()
     {
@@ -32,14 +37,22 @@ class Post extends Model
     {
         return $this->hasMany(View::class);
     }
-    public function categories()
+    public function category()
     {
-        return $this->belongsToMany(Category::class,'post_categories','category_id','post_id');
+        return $this->belongsTo(Category::class);
     }
 
     public function tags()
     {
-        return $this->belongsToMany(Tag::class,'posts_tags','tag_id','post_id');
+        return $this->belongsToMany(Tag::class, 'tag_posts', 'post_id', 'tag_id');
     }
-
+    public function seo(){
+        return $this->hasOne(Seo::class);
+    }
+    public function contents(){
+        return $this->hasMany(Content::class);
+    }
+    public function image(){
+        return $this->hasOne(Image::class);
+    }
 }

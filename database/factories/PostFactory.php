@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Author;
+use App\Models\Category;
+use App\Models\Tag;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,11 +22,10 @@ class PostFactory extends Factory
         return [
             'title' => $this->faker->sentence(),
             'slug' => $this->faker->slug(),
-            'content' => $this->faker->randomHtml(3,5),
             'author_id' => Author::all()->random()->id,
+            'category_id' => Category::all()->random()->id,
             'publication_date' => $this->faker->date(),
             'image' => $this->faker->imageUrl,
-            
         ];
     }
 }

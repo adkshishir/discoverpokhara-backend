@@ -21,36 +21,27 @@ $heads = [
 
 function getActionButtons($id)
 {
-    $btnEdit = '<a href="#" class="btn btn-xs btn-default text-primary mx-1 shadow" title="Edit" data-id="' . $id . '">
-                    <i class="fa fa-lg fa-fw fa-pen"></i>
-                </a>';
+$btnEdit = '<a href="#" class="btn btn-xs btn-default text-primary mx-1 shadow" title="Edit" data-id="' . $id . '">
+    <i class="fa fa-lg fa-fw fa-pen"></i>
+</a>';
 
-    $btnDelete = '<a class="btn btn-xs btn-default text-danger mx-1 shadow" title="Delete" data-id="' . $id . '">
-                    <i class="fa fa-lg fa-fw fa-trash"></i>
-                </a>';
+$btnDelete = '<a class="btn btn-xs btn-default text-danger mx-1 shadow" title="Delete" data-id="' . $id . '">
+    <i class="fa fa-lg fa-fw fa-trash"></i>
+</a>';
 
-    $btnDetails = '<a class="btn btn-xs btn-default text-teal mx-1 shadow" title="Details" data-id="' . $id . '">
-                    <i class="fa fa-lg fa-fw fa-eye"></i>
-                </a>';
+$btnDetails = '<a class="btn btn-xs btn-default text-teal mx-1 shadow" title="Details" data-id="' . $id . '">
+    <i class="fa fa-lg fa-fw fa-eye"></i>
+</a>';
 
-    return $btnEdit . ' ' . $btnDelete . ' ' . $btnDetails;
+return $btnEdit . ' ' . $btnDelete . ' ' . $btnDetails;
 }
-// $btnEdit = '<a href="#" class="btn btn-xs btn-default text-primary mx-1 shadow" title="Edit">
-//                 <i class="fa fa-lg fa-fw fa-pen"></i>
-//             </a>';
-// $btnDelete = '<a class="btn btn-xs btn-default text-danger mx-1 shadow" title="Delete">
-//                   <i class="fa fa-lg fa-fw fa-trash"></i>
-//               </a>';
-// $btnDetails = '<a class="btn btn-xs btn-default text-teal mx-1 shadow" title="Details">
-//                    <i class="fa fa-lg fa-fw fa-eye"></i>
-//                </a>';
 $data=[];
 foreach ($posts as $key => $post) {
 $data[] = [
 $post->id,
 $post->title,
 $post->slug,
- "<div class=\"d-flex\">" . getActionButtons($post->id) . "</div>",
+"<div class=\"d-flex\">" . getActionButtons($post->id) . "</div>",
 
 
 ];
@@ -98,8 +89,6 @@ $config = [
         e.preventDefault();
         var id = $(this).data('id');
         // Perform delete action for the record with the provided ID
-
-      
 
     });
 

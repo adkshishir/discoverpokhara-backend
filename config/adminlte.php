@@ -560,4 +560,5 @@ return [
     */
 
     'livewire' => false,
+    'enabled_old_support' => true,
 ];

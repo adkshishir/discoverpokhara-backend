@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PostTag>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\FlashNew>
  */
-class PostTagFactory extends Factory
+class FlashNewFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,8 +17,8 @@ class PostTagFactory extends Factory
     public function definition(): array
     {
         return [
-            'post_id'=>fake()->randomElement([1,2,3,4,5,6,7,8,9]),
-            'tag_id'=>fake()->randomElement([1,2,3,4,5,6,7,8,9]),
+            'title'=>$this->faker->sentence(),
+            'link'=>$this->faker->url(),
         ];
     }
 }

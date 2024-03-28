@@ -13,12 +13,17 @@ return new class extends Migration
     {
         Schema::create('seos', function (Blueprint $table) {
             $table->id();
-            $table->string('seo_type');
-            $table->string('parent_id');
+            $table->foreignId('post_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('tag_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('category_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('meta_title');
-            $table->longText('schema');
             $table->text('meta_description');
             $table->string('meta_keywords');
+            $table->string('cannonical_url');
+            $table->string('og_title')->nullable();
+            $table->string('og_description')->nullable();
+            $table->string('og_image')->nullable();
+            $table->longText('schema');
             $table->timestamps();
         });
     }
