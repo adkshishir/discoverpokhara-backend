@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Image;
+use App\Models\Seo;
 use App\Models\Tag;
 
 use Illuminate\Http\Request;
@@ -17,9 +18,10 @@ class TagsController extends Controller
      */
     public function index()
     {
-        $tags=Tag::all();
+        $tags=Tag::select('id','name','slug')->get();
         $data=[
-            'tags'=>$tags
+            'tags'=>$tags,
+           
         ];
         return view('admin.tags.index',$data);
     }
@@ -29,7 +31,13 @@ class TagsController extends Controller
      */
     public function create()
     {
-        return view('admin.tags.create');
+        $data=[];
+        $categories=Category::pluck('name','id');
+        // dd($categories);
+        $data=[
+            'categories'=>$categories
+        ];
+        return view('admin.tags.create',$data);
     }
 
     /**
@@ -37,45 +45,48 @@ class TagsController extends Controller
      */
     public function store(Request $request)
     {
-        // $validatedata=$request->validate([
-        //     'name'=>'required',
-        //     'slug'=>'required|unique:tags,slug',
-        //     'image'=>'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        //     'meta_title'=>'required',
-        //     'meta_description'=>'required',
-        //     'meta_keywords'=>'required'
-        // ]);
-        $validator=Validator::make($request->all(),[
-            'name'=>'required',
-            'slug'=>'required|unique:tags,slug',
-            'image'=>'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'meta_title'=>'required',
-            'meta_description'=>'required',
-            'meta_keywords'=>'required'
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'category_id' => 'required',
+            'slug' => 'required|unique:categories,slug',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'description' => 'required',
+            'meta_title' => 'required',
+            'meta_description' => 'required',
+            'meta_keywords' => 'required',
+            'schema' => 'required',
+            'cannonical_url' => 'required|string|max:255',
         ]);
           if($validator->fails()){
               return redirect()->back()->withErrors($validator)->withInput();
           }
-        Tag::create([
+       $tag= Tag::create([
             'name'=>$request->name,
-            'slug'=>$request->slug
+            'slug'=>$request->slug,
+            'category_id'=>$request->category_id,
+            'description' => $request->description,
+            'image' => $request->image->getClientOriginalName(),
         ]);
-
-        $request->image->move(public_path('images'),$request->image->getClientOriginalName());
-        Image::create([
-            'name'=>$request->image->getClientOriginalName(),
-            'parent_id'=>Tag::latest()->first()->id,
-            'parent_type'=>'Tag',
-            'alt'=>$request->name
+        Seo::create([
+            'tag_id'=>$tag->id,
+            'meta_title' => $request->meta_title,
+            'meta_description' => $request->meta_description,
+            'meta_keywords' => $request->meta_keywords,
+            'schema' => $request->schema,
+            'cannonical_url' => $request->cannonical_url
         ]);
-        return redirect()->route('tags.index');
+        if($request->hasFile('image')){
+          $tag->addMediaFromRequest('image')->toMediaCollection('tags');
+       }
+        return redirect()->route('tags.index',['success'=>'Tag created successfully']);
     }
 
     /**
      * Display the specified resource.
      */
     public function show(Tag $tag)
-    {
+    { 
+
         $data=[
         'tag'=>$tag
         ];
@@ -85,14 +96,17 @@ class TagsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Tag $tag)
     {
-        $tag=Tag::find($id);
+        $categories=Category::pluck('name','id');
         if(!$tag){
             return redirect()->route('admin.tags.index',['error'=>'Tag not found']);
         }
+        
         $data=[
-            'tag'=>$tag
+            'tag'=>$tag,
+            'image'=>$tag->getMedia('tags')->first(),
+            'categories'=>$categories
         ];
         return view('admin.tags.edit',$data);
     }
@@ -100,9 +114,49 @@ class TagsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Tag $tag)
     {
-        //
+        if(!$tag){
+            return redirect()->route('admin.tags.index',['error'=>'Tag not found']);
+        }
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'category_id' => 'required',
+            'slug' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'description' => 'required',
+            'meta_title' => 'required',
+            'meta_description' => 'required',
+            'meta_keywords' => 'required',
+            'schema' => 'required',
+            'cannonical_url' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('admin/tags/'.$tag->id.'/edit')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
+     
+        $tag->update([
+            'name'=>$request->name,
+            'slug'=>$request->slug,
+            'category_id'=>$request->category_id,
+            'description' => $request->description,
+        ]);
+        Seo::where('tag_id',$tag->id)->update([
+            'meta_title' => $request->meta_title,
+            'meta_description' => $request->meta_description,
+            'meta_keywords' => $request->meta_keywords,
+            'schema' => $request->schema,
+            'cannonical_url' => $request->cannonical_url
+        ]);
+        if($request->hasFile('image')){
+           $tag->clearMediaCollection('tags');
+           $tag->addMediaFromRequest('image')->toMediaCollection('tags');
+        }
+        return redirect()->route('tags.index',['success'=>'Tag updated successfully']);
+        
     }
 
     /**

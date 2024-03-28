@@ -17,12 +17,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $category=Category::all();
+        $categories=Category::select('id','name','slug')->get();
         $data=[
-            'category'=>$category,
-            
+            'categories'=>$categories,   
         ];
-
        return view('admin.categories.index',$data);
     }
 
@@ -43,40 +41,39 @@ class CategoryController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'slug' => 'required|unique:categories,slug',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'description' => 'required',
             'meta_title' => 'required',
             'meta_description' => 'required',
             'meta_keywords' => 'required',
             'schema' => 'required',
+            'cannonical_url' => 'required|string|max:255',
         ]);
-
         if ($validator->fails()) {
             return redirect('admin/categories/create')
                         ->withErrors($validator)
-                        ->withInput();
+                        ->withInput($request->all());
         }
         $category=Category::create([
             "name"=>$request->name,
             "slug"=>$request->slug,
+            'image' => $request->image->getClientOriginalName(),
+            'description' => $request->description,
+
         ]);
-            //    before save it into the database first save this into the folder
-             $request->image->move(public_path('images'),$request-> image->getClientOriginalName());
-        Image::create([
-            "name"=>$request->image->getClientOriginalName(),
-             "parent_id"=>$category->id,
-             "parent_type"=>'Category',
-             'alt' => 'Auth Logo',
-        ]);
-       
+        
+        if($request->hasFile('image')){
+            $category->addMediaFromRequest('image')->toMediaCollection('categories');
+           }
         Seo::create([
-            "seo_type"=>"category",
-            "parent_id"=>$category->id,
+            "category_id"=>$category->id,
             "meta_title"=>$request->meta_title,
             "meta_description"=>$request->meta_description,
             "meta_keywords"=>$request->meta_keywords,
-            'schema' => $request->schema
+            'schema' => $request->schema,
+            'cannonical_url' => $request->cannonical_url,
+
         ]);
-        $data['category']=$category;
        return redirect()->route('categories.index',['success'=>'Category created successfully']);
     }
 
@@ -87,7 +84,6 @@ class CategoryController extends Controller
     {
         try{
             $category=Category::find($id);
-        
             $data=[
                'category'=>$category
            ];
@@ -101,31 +97,28 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
-    { 
-        $category=Category::find($id);
+    public function edit(Category $category)
+    {     
+    // get category with seo and the images
+      $image=$category->getMedia('categories')->first();
         if(!$category){
             return redirect()->route('categories.index',['error'=>'Category not found']);
         }
         $data=[
-            'category'=>$category
+            'category'=>$category,
+            'image'=>$image
         ];
-        return view('categories.edit',$data);
+        return view('admin.categories.edit',$data);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        $category=Category::find($id);
-        // check the id and the type of the seo
-        $seo=Seo::where('parent_id',$category->id)->where('seo_type','category')->first();
-        $image=Image::where('parent_id',$category->id)->where('parent_type','Category')->first();
+    public function update(Request $request, Category $category)
+    {  
         if(!$category){
             return redirect()->route('categories.index',['error'=>'Category not found']);
         }
-
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'slug' => 'required',
@@ -144,34 +137,27 @@ class CategoryController extends Controller
         $category->update([
             "name"=>$request->name,
             "slug"=>$request->slug,
+            'description' => $request->description,
         ]);
-
-        if($request->hasFile('image')){
-            // update the image in the folder or update the image in the folder
-              $image->update([
-                 "name"=>$request->image->getClientOriginalName(),
-                 "parent_id"=>$category->id,
-                 "parent_type"=>'Category',
-                 'alt' => 'Auth Logo',
-            ]);
+       $seo=Seo::where('category_id',$category->id)->first();
+       $seo->update([
+        "meta_title"=>$request->meta_title,
+        "meta_description"=>$request->meta_description,
+        "meta_keywords"=>$request->meta_keywords,
+        'schema' => $request->schema,
+        'cannonical_url' => $request->cannonical_url,
+    ]);
+        if($request->image){
+            $category->clearMediaCollection('categories');
+            $category->addMediaFromRequest('image')->toMediaCollection('categories');
         }
-        $seo->update([
-            "seo_type"=>"category",
-            "parent_id"=>$category->id,
-            "meta_title"=>$request->meta_title,
-            "meta_description"=>$request->meta_description,
-            "meta_keywords"=>$request->meta_keywords
-        ]);
-         
-        return redirect()->route('admin.categories.index',['success'=>'Category updated successfully']);
+        return redirect()->route('categories.index',['success'=>'Category updated successfully']);
     }
-
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Category $category)
     {
-        $category=Category::find($id);
         if(!$category){
             return redirect()->route('admin.categories.index',['error'=>'Category not found']);
         }

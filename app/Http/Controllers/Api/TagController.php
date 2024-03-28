@@ -32,19 +32,19 @@ class TagController extends Controller
     }
 }
     public function show(string $slug){
-        $tag=Tag::where('slug',$slug)->select('id', 'name', 'slug')->with([
+        $tag=Tag::where('slug',$slug)->select('id', 'name', 'slug')->with(['seo',
             'posts' => function ($query) {
-                $query->select( 'title', 'slug', 'author_id','image');
+                $query->select( 'title', 'slug', 'author_id','image','category_id')->with(['category'=>function ($q){
+                    $q->select('id','name','slug');
+                }]);
             }
         ])->get()->first();
-        $seo=Seo::where('parent_id',$tag->id)->where('seo_type','tags')->select('meta_title','meta_description','meta_keywords','schema')->first();
         if($tag){
            return response()->json([
                'success'=>true,
                'status'=>200,
                'data'=>[
                    'tag'=>$tag,   
-                   'seo'=>$seo
                ]
            ],200);
         }

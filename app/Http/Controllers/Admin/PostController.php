@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Author;
 use App\Models\Category;
+use App\Models\Content;
 use App\Models\Image;
 use App\Models\Post;
 use App\Models\PostCategory;
 use App\Models\PostTag;
 use App\Models\Seo;
+use App\Models\SpecialSection;
 use App\Models\Tag;
+use App\Models\TagPost;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -22,7 +25,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $post = Post::select('id','title','slug',)->get();  
+        $post = Post::select('id','title','slug')->get();  
         $data = [
             'posts' => $post
         ];
@@ -50,59 +53,87 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-         
+        //  dd($request->all());
         $validator = Validator::make($request->all(), [
             'title' => 'required',
-            'slug' => 'required|unique:posts,slug',
-            'content' => 'required',
-            'categories' => 'required|array|exists:categories,id',
+            // 'slug' => 'required|unique:posts,slug',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'slug' => 'required',
+            'category_id' => 'required|exists:categories,id',
             'tags' => 'required|array|exists:tags,id',
             'meta_title' => 'required',
             'meta_description' => 'required',
-            'meta_keywords' => 'required'
+            'meta_keywords' => 'required',
+            'heads' => 'required',
+            'contents' => 'required',
+            'section_head'=>'array',
+            'section_head.*' => 'required',
+            'section_description'=>'array',
+            'section_description.*' => 'required',
+            'section_image'=>'array',
+            'section_image.*' => 'required',
+            'section_url'=>'array',
+            'section_url.*' => 'required',
+            
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
+            
         }
+        
         $author=Author::where('user_id',auth()->user()->id)->first();
         $post = Post::create([
             'title' => $request->title,
             'slug' => $request->slug,
-            'content' => $request->content,
             'author_id' => $author->id,
+            'category_id' => $request->category_id,
             'publication_date'=>Carbon::now()->format('Y-m-d '),
 
         ]);
+        // save image to media collection using library
+        if($request->hasFile('image')){
+         $post->addMediaFromRequest('image')->toMediaCollection('posts');
+        }
            Seo::create([
-            'seo_type'=>'post',
-            'parent_id'=>$post->id,
+            'post_id'=>$post->id,
             'schema'=>$request->schema,
             'meta_title'=>$request->meta_title,
             'meta_description'=>$request->meta_description,
-            'meta_keywords'=>$request->meta_keywords
+            'meta_keywords'=>$request->meta_keywords,
+            'cannonical_url'=>$request->cannonical_url
         ]);
         foreach ($request->tags as $tag) {
-            PostTag::create([
-                'post_id' => $post->id,
-                'tag_id' => $tag
-            ]);
+           TagPost::create([
+               'post_id' => $post->id,
+               'tag_id' => $tag
+           ]);
         }
-        foreach ($request->categories as $category) {
-            PostCategory::create([
+        for($i=0;$i<count($request->heads);$i++){
+              
+          $content=  Content::create([
                 'post_id' => $post->id,
-                'category_id' => $category
+                'title' => $request->heads[$i],
+                'content' => $request->contents[$i]?:"-",
             ]);
+              if(isset($request->section_head[$i+1])){
+            foreach($request->section_head[$i+1] as $key=>$value){
+                //  dd($request->section_image[$i+1][$key],$request->section_head[$i+1][$key],$request->section_description[$i+1][$key],$request->section_url[$i+1][$key],$value);
+                  $special='';
+                    $value!=''&& $special= SpecialSection::create([
+                    'content_id'=>$content->id,
+                    'name'=>$value,
+                    'image_name'=>$request->section_image[$i+1][$key]?:"-",
+                    'description'=>$request->section_description[$i+1][$key]?:"-",
+                    'url'=>$request->section_url[$i+1][$key]?:"-",
+                ]);
+                // save the image into the media library
+                if(isset($request->section_image[$i+1][$key])){
+                    $special->addMedia($request->section_image[$i+1][$key])->toMediaCollection('special-section');
+                }
+            }
         }
+    }
 
-        if ($request->hasFile('image')) {
-            $request->image->move(public_path('images/posts'), $request->image->getClientOriginalName());
-            Image::create([
-                'name' => $request->image->getClientOriginalName(),
-                'parent_id' => $post->id,
-                'parent_type' => 'Post',
-                'alt' => $request->title
-            ]);
-        }
         return redirect()->route('posts.index', ['success' => 'Post created successfully']);
     }
 
@@ -114,10 +145,12 @@ class PostController extends Controller
         $post = Post::find($id);
         $category = Category::all()->pluck('name', 'id');
         $tag = Tag::pluck('name', 'id');
+       $image=$post->getMedia()->first();
         $data = [
             'post' => $post,
             'categories' => $category,
-            'tags' => $tag
+            'tags' => $tag,
+            'image'=>$image
         ];
         return view('admin.posts.show', $data);
     }
@@ -125,101 +158,117 @@ class PostController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Post $post)
     {
-        $post = Post::find($id);
+        try{      
         $category = Category::all()->pluck('name', 'id');
         $tag = Tag::pluck('name', 'id');
-        $seo=Seo::where('parent_id',$post->id)->where('seo_type','post')->first();
-        $image=Image::where('parent_id',$post->id)->where('parent_type','Post')->first();
+        $image=$post->getMedia("posts")->first();
+        
         if(!$post){
             return redirect()->route('posts.index',['error'=>'Post not found']);
         }
-
         $data = [
             'post' => $post,
+            'image' => $image,
             'categories' => $category,
-            'tags' => $tag,
-            'seo' => $seo,
-            'image' => $image
+            'tags' => $tag
         ];
         return view('admin.posts.edit', $data);
     }
+    catch (\Exception $e) {
+        dd($e->getMessage());
+        return redirect()->route('posts.index',['error'=>'Post not found']);
+    }
+}
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Post $post)
     {
-        $post=Post::find($id);
-        $seo=Seo::where('parent_id',$post->id)->where('seo_type','post')->first();
-        $image=Image::where('parent_id',$post->id)->where('parent_type','Post')->first();
-        $postTag=PostTag::where('post_id',$post->id)->get();
-        $postCategory=PostCategory::where('post_id',$post->id)->get();
-        if(!$post){
-            return redirect()->route('posts.index',['error'=>'Post not found']);
-        }
+        $seo=Seo::where('post_id',$post->id)->first();
+        $tags=TagPost::where('post_id',$post->id)->get();
+        $contents=Content::where('post_id',$post->id)->get();
+        
         $validator = Validator::make($request->all(), [
             'title' => 'required',
-            'slug' => 'required|unique:posts,slug',
-            'content' => 'required',
-            'categories' => 'required|array|exists:categories,id',
-            'tags' => 'required|array|exists:tags,id',
+            'slug' => 'required',
+            'category_id' => 'required|exists:categories,id',
             'meta_title' => 'required',
             'meta_description' => 'required',
-            'meta_keywords' => 'required'
+            'meta_keywords' => 'required',
+            'heads' => 'required',
+            'contents' => 'required',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        $author=Author::where('user_id',auth()->user()->id)->get()->first();
-        $post->update([
+        
+        $author=Author::where('user_id',auth()->user()->id)->first();
+          $post->update([
             'title' => $request->title,
             'slug' => $request->slug,
-            'content' => $request->content,
             'author_id' => $author->id,
+            'category_id' => $request->category_id,
+            'publication_date'=>Carbon::now()->format('Y-m-d '),
 
         ]);
-        $seo->update([
-            'seo_type'=>'post',
-            'parent_id'=>$post->id,
+           $seo->update([
+            'post_id'=>$post->id,
             'schema'=>$request->schema,
             'meta_title'=>$request->meta_title,
             'meta_description'=>$request->meta_description,
-            'meta_keywords'=>$request->meta_keywords
+            'meta_keywords'=>$request->meta_keywords,
+            'cannonical_url'=>$request->cannonical_url
         ]);
-        foreach($$postCategory as $category){
-            $category->delete();
+        // delete previous tags
+          if(count($request->tags)>0){
+            if(count($tags)>0){
+                foreach ($tags as $tag) {
+                    $tag->delete();
+                }
+                foreach ($request->tags as $tag) {
+                   TagPost::create([
+                       'post_id' => $post->id,
+                       'tag_id' => $tag
+                   ]);
+                }
+              }
+          }
+        // delete previous contents
+        foreach ($contents as $content) {
+            $special=SpecialSection::where('content_id',$content->id)->get();
+             if(count($special)>0){
+                foreach($special as $value){
+                    $value->delete();
+                    $value->clearMediaCollection('special_sections');
+                }
+            }
+            $content->delete();
         }
+        for($i=0;$i<count($request->heads);$i++){
+            Content::create([
+                'post_id' => $post->id,
+                'title' => $request->heads[$i],
+                'content' => $request->contents[$i]
+            ]);
+            if(isset($request->section_image[$i+1])){
+                $special=SpecialSection::create([
+                    'content_id'=>$content->id,
+                    'title'=>$request->section_head[$i+1]?:'-',
+                    'description'=>$request->section_description[$i+1]?:'-',
+                    'url'=>$request->section_url[$i+1]
+                ]);
+                if($request->hasFile('section_image') && $request->section_image[$i+1] != null){
+                    $special->addMedia($request->section_image[$i+1])->toMediaCollection('special_sections');
+                }
+            }
 
-        foreach($$postTag as $tag){
-            $tag->delete();
-        }
-        foreach ($request->tags as $tag) {
-            $tag->create([
-                'post_id' => $post->id,
-                'tag_id' => $tag
-            ]);
-        }
-        foreach ($request->categories as $category) {
-            PostCategory::updateOrCreate([
-                'post_id' => $post->id,
-                'category_id' => $category
-            ]);
-        }
-        // delete image from folder
-        if($image){
-            unlink(public_path('images/posts/'.$image->name));
-            $image->delete();
         }
         if ($request->hasFile('image')) {
-            $request->image->move(public_path('images/posts'), $request->image->getClientOriginalName());
-            Image::updateOrCreate([
-                'name' => $request->image->getClientOriginalName(),
-                'parent_id' => $post->id,
-                'parent_type' => 'Post',
-                'alt' => $request->title
-            ]);
+            $post->clearMediaCollection('posts');
+            $post->addMedia($request->image)->toMediaCollection('posts');
         }
         return redirect()->route('posts.index', ['success' => 'Post created successfully']);
     }
@@ -230,15 +279,15 @@ class PostController extends Controller
     public function destroy(string $id)
     {
         $post=Post::find($id);
-        $postCategory=PostCategory::where('post_id',$post->id)->get();
-        $postTag=PostTag::where('post_id',$post->id)->get();
-        foreach($$postCategory as $category){
-            $category->delete();
+        if(!$post){
+            return redirect()->route('posts.index',['error'=>'Post not found']);
         }
-        foreach($$postTag as $tag){
+        $postTag=TagPost::where('post_id',$post->id)->get();
+
+        foreach($postTag as $tag){
             $tag->delete();
         }
-        $seo=Seo::where('parent_id',$post->id)->where('seo_type','post')->first();
+        $seo=Seo::where('post_id',$post->id)->first();
         if($seo){
             $seo->delete();
         }
@@ -246,9 +295,6 @@ class PostController extends Controller
         if($image){
             unlink(public_path('images/posts/'.$image->name));
             $image->delete();
-        }
-        if(!$post){
-            return redirect()->route('posts.index',['error'=>'Post not found']);
         }
         $post->delete();
         return redirect()->route('posts.index',['success'=>'Post deleted successfully']);

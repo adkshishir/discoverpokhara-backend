@@ -15,16 +15,26 @@ class CategoryController extends Controller
    public function index(){
    try{
     
-    $categories = Category::select('id', 'name', 'slug')
-    ->with(['posts' => function ($query) {
-        $query->select( 'title', 'slug','image')->get();
-    }])
-    ->latest()->get();
+    $categories = Category::select('id','name','slug','image')->with(['posts'])->get();
+    $tempCategorys=[];
+    foreach($categories as $key=>$category){
+        $tempCategorys[$key]['id']=$category->id;
+        $tempCategorys[$key]['name']=$category->name;
+        $tempCategorys[$key]['slug']=$category->slug;
+        $tempCategorys[$key]['image']=$category->image;
+         foreach($category->posts as $key1=>$post){
+            $tempCategorys[$key]['posts'][$key1]['id']=$post->id;
+            $tempCategorys[$key]['posts'][$key1]['title']=$post->title;
+            $tempCategorys[$key]['posts'][$key1]['slug']=$post->slug;
+
+            
+         }
+    }
     if($categories){
         return response()->json([
             'success'=>true,
             'status'=>200,
-            'categories'=>$categories
+            'categories'=>$tempCategorys
         ],200);
     }
     else{
@@ -44,18 +54,17 @@ class CategoryController extends Controller
    }
 }
 public function show(string $slug){
-         $category=Category::where('slug',$slug)->with(['posts'=>function($query){
-             $query->select('title','slug','author_id','image');
-         }])->get()->first();
-         $seo=Seo::where('parent_id',$category->id)->where('seo_type','category')->select('meta_title','meta_description','meta_keywords','schema')->first();
-
+         $category=Category::where('slug',$slug)->with(['seo'])->get()->first();
+         $post=Post::where('category_id',$category->id)->select('id','title','slug','image','updated_at','author_id')->with('comments','author')->latest()->paginate(10);
+         $popular=Post::where('category_id',$category->id)->select('id','title','slug','image','updated_at')->withCount('comments')->orderBy('comments_count','desc')->limit(5)->get();
          if($category){
             return response()->json([
                 'success'=>true,
                 'status'=>200,
                 'data'=>[
-                    'seo'=>$seo,
-                    'category'=>$category
+                    'category'=>$category,
+                    'posts'=>$post,
+                    'popular'=>$popular
                 ]
             ],200);
          }
