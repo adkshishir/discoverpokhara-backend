@@ -14,10 +14,9 @@
 
 
         @endphp
-        
-        <form class="pt-5 rounded form bg-white p-3" enctype="multipart/form-data" 
-            action="{{ route('posts.update', $post) }}"
-             method="POST" >
+
+        <form class="pt-5 rounded form bg-white p-3" enctype="multipart/form-data"
+            action="{{ route('posts.update', $post) }}" method="POST">
             @csrf
             @method('PUT')
             <div id="seo" class="row">
@@ -36,15 +35,15 @@
                         placeholder="Enter meta keywords" fgroup-class="" />
                 </div>
                 <div class="col-md-6">
-                    <x-adminlte-input value="{{ $post->seo->cannonical_url }}" name="cannonical_url" label="Cannonical Url"
-                      placeholder="Enter cannonical Url" fgroup-class="" />
-                  </div>
+                    <x-adminlte-input value="{{ $post->seo->cannonical_url }}" name="cannonical_url"
+                        label="Cannonical Url" placeholder="Enter cannonical Url" fgroup-class="" />
+                </div>
                 <div class="col-md-12">
                     @php
 
                     @endphp
-                    <x-adminlte-textarea name="schema" rows="5" label="Schema"
-                        placeholder="Write Schema...">{{ $post->seo->schema }}</x-adminlte-textarea>
+                    <x-adminlte-textarea name="schema" rows="5" label="Schema" placeholder="Write Schema...">{{
+                        $post->seo->schema }}</x-adminlte-textarea>
                     @if($errors->has('schema'))
                     <div class="text-danger">{{ $errors->first('schema') }}</div>
                     @endif
@@ -82,7 +81,7 @@
                         {{-- <x-slot name="appendSlot">
                             <x-adminlte-button theme="outline-dark" label="Clear" icon="fas fa-lg fa-ban text-danger" />
                         </x-slot> --}}
-                        
+
                         @isset($categories)
                         @foreach($categories as $id=>$value)
                         <option value="{{ $id}}">{{ $value }}</option>
@@ -127,46 +126,59 @@
                     ],
                     ]
                     @endphp
-                    
+
                     <div class="container-fluid  w-full">
-                        @foreach($post->contents as $key=>$content)
-                        <div class="form-group w-full">
-                            <x-adminlte-input class="col-12" name='heads[]' label="Header" placeholder="Enter header" value="{{ $content->title }}" />
-                            <x-adminlte-text-editor class="col-12" id="content{{$key}}" name="contents[]" rows='7' label="Content" label-class=""
-                                igroup-size="sm" placeholder="Main Content..." :config="$config" >{{ $content->content }}</x-adminlte-text-editor>
-                        </div>
-                        
-                        {{-- special section start --}}
-                      
-                        @isset($content->special_sections)
-                        @foreach($content->special_sections as $sectionIndex=>$section)
-
-                        <div class="container border rounded p-3 m-2 col-md-5 mx-auto bg-secondary  special-section-box">
-                            <x-adminlte-input class="col-12" name="section_header[${sectionIndex}][]" label="Header"
-                                placeholder="Enter section header" />
-                            <x-adminlte-input class="col-12" name="section_description[${sectionIndex}][]" label="Description"
-                                placeholder="Enter section description" />
-                            <x-adminlte-input class="col-12" name="section_url[${sectionIndex}][]" label="Url"
-                                placeholder="Enter section Url" />
+                          
+                             @foreach($post->contents as $key=>$content)
+                         <div class="container-fluid">
+                            <div class="form-group w-full">
+                                <x-adminlte-input class="col-12" name='heads[]' label="Header" placeholder="Enter header"
+                                    value="{{ $content->title }}" />
+                                <x-adminlte-text-editor class="col-12" id="content{{$key}}" name="contents[]" rows='7'
+                                    label="Content" label-class="" igroup-size="sm" placeholder="Main Content..."
+                                    :config="$config">{{ $content->content }}</x-adminlte-text-editor>
+                            </div>
+                            <button class="btn btn-danger remove-input" type="button" id="remove-content">Remove</button>
+    
+                            <div id="section" class="w-100 row container m-5 rounded p-2 mx-auto special-section"
+                                style="background-color: aliceblue">
+                                <h3 class="col-12">Special Section</h3>
+    
+    
+                                {{-- special section start --}}
+    
+                                @isset($content->special_sections)
+                                @foreach($content->special_sections as $sectionIndex=>$section)
+                                    
+                                <div
+                                    class="container border rounded p-3 m-2 col-md-5 mx-auto bg-secondary  special-section-box">
+                                    <x-adminlte-input class="col-12" value="{{$section->name}}" name="section_head[{{$sectionIndex}}][]" label="Header"
+                                        placeholder="Enter section header" />
+                                    <x-adminlte-input class="col-12" value="{{$section->description}}" name="section_description[{{$sectionIndex}}][]"
+                                        label="Description" placeholder="Enter section description" />
+                                    <x-adminlte-input class="col-12" value="{{$section->url}}" name="section_url[{{$sectionIndex}}][]" label="Url"
+                                        placeholder="Enter section Url" />
+    
+                                    <x-adminlte-input type="file" class="col-12" name='section_image[{{$sectionIndex}}][]'
+                                        label="Section Image" placeholder="Enter section Image" />
+                                    <button type="button" class="btn btn-danger float-right remove-section">Remove
+                                        Section</button>
+                                </div>
+                                @endforeach
+                                @endisset
+                                {{-- special section end --}}
                                 
-                            <x-adminlte-input type="file" class="col-12" name='section_image[${sectionIndex}][]'
-                                label="Section Image" placeholder="Enter section Image" />
-                                <button type="button" class="btn btn-danger float-right remove-section">Remove Section</button>
-                        </div>
-                          @endforeach
-                          @endisset
-                        {{-- special section end --}}
+                                <button type="button" id="add-section" class="btn col-12  add-section">
+                                    <span class="btn btn-primary">Add Section</span></button>
+                            </div>
+                         </div>
                         @endforeach
-                        
-                        <div id="section" class="w-100 row container m-5 rounded p-2 mx-auto special-section"
-                            style="background-color: aliceblue">
-                            <h3 class="col-12">Special Section</h3>
-                            <button type="button" id="add-section" class="btn col-12  add-section">
-                                <span class="btn btn-primary">Add Section</span></button>
-                        </div>
-                        <button id="add-more" class="col-2 float-right btn btn-primary add-more mx-2 " type="button">Add More</button>
-                    </div>  
+                          
 
+                        <button id="add-more" class="col-2 float-right btn btn-primary add-more mx-2 " type="button">Add
+                            More</button>
+
+                    </div>
                 </div>
                 {{-- {{dd($image->getUrl())}} --}}
 
@@ -174,10 +186,10 @@
                     {{-- With label and feedback disabled --}}
                     <img src={{$image->getUrl()}} alt="this is iamge" id="imagepreview" class="w-25">
                     <div>
-                    
+
                         <label for="image" class="form-label">Image</label>
-                        <input class="form-control form-control-lg" value="{{ $image->getUrl() }}" id="image" type="file" placeholder=""
-                            name="image">
+                        <input class="form-control form-control-lg" value="{{ $image->getUrl() }}" id="image"
+                            type="file" placeholder="" name="image">
                     </div>
                     {{--
                     <x-adminlte-input-file value="{{ old('image') }}" class="w-full" fgroup-class="" name="image"
@@ -219,12 +231,20 @@
     $(document).on('click', '.add-more', function() {
         count=count+1
     let inputGroup = `
-            <div class="form-group w-full">
+           <div id="cantainer${count}" class="form-group w-full">
                 <x-adminlte-input class="col-12" name='heads[]' label="Header" placeholder="Enter header" />
                 <x-adminlte-text-editor class="col-12" id="content${count}" name="contents[]" rows='7' label="Content" label-class=""
                     igroup-size="sm" placeholder="Main Content..." :config="$config" />
+                   
                     <button type="button" class="btn btn-danger remove-input">Remove</button>
-                </div>
+                    <div id="section${count}" class="w-100 row container m-5 rounded p-2 mx-auto special-section" style="background-color: aliceblue">
+                            <h3 class="col-12">Special Section</h3>
+
+                            <button type="button" id="add-section" class="btn col-12 add-section">
+                                <span class="btn btn-primary">Add  Section</span>
+                            </button>
+                     </div>
+             </div>
             `
 
             $('#add-more').before(inputGroup);
@@ -250,7 +270,36 @@
     $(document).on('click', '.remove-input', function() {
         $(this).closest('.container-fluid').remove();
     });
+    
+    $(document).on('click', '.remove-section', function() {
+        $(this).closest('.special-section-box').remove();
+    });
 
+
+
+    // add new section to the nearest position
+    
+ $(document).on('click', '.add-section', function() {
+          let  sectionIndex= $(this).closest('.special-section').index()-1;
+          console.log(sectionIndex)
+                    let sectionbox=`
+                           <div class="container border rounded p-3 m-2 col-md-5 mx-auto bg-secondary  special-section-box">
+                                    <x-adminlte-input class="col-12" name='section_head[${sectionIndex}][]' label="Header"
+                                        placeholder="Enter section header" />
+                                    <x-adminlte-input class="col-12" name='section_description[${sectionIndex}][]' label="Description"
+                                        placeholder="Enter section description" />
+                                    <x-adminlte-input class="col-12" name='section_url[${sectionIndex}][]' label="Url"
+                                        placeholder="Enter section Url" />
+                                        
+                                    <x-adminlte-input type="file" class="col-12" name='section_image[${sectionIndex}][]'
+                                        label="Section Image" placeholder="Enter section Image" />
+                                        <button type="button" class="btn btn-danger float-right remove-section">Remove Section</button>
+                                </div>
+                                `;
+                $(this).before(sectionbox)
+
+                 
+    });
      
 // track submit button before submit
 $(document).on('submit', 'form', function(e) {

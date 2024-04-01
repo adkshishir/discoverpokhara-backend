@@ -117,8 +117,7 @@
                         </x-slot>
                         @if(old('category_id'))
                         <option value="{{ old('category_id') }}">{{ $categories[old('category_id')] }}</option>
-                        @else
-                        <option value="">Select Category</option>
+                       
                         @endif
                         @isset($categories)
                         @foreach($categories as $id=>$value)
@@ -321,7 +320,7 @@
      function validateForm(){
         //   return false
         if(document.getElementById("seo").style.display === "none"){
-        document.getElementById("general").style.display = "none";
+         document.getElementById("general").style.display = "none";
          document.getElementById("seo").style.display = "flex";
          $('#submit-button').text('Submit')
          return false
@@ -344,6 +343,12 @@
                'section-description': $('input[name=section_description]').val(),
                'section-url'       : $('input[name=section_url]').val(),
                'section-image'     : $('input[name=section_image]').val(),
+           }
+           if(formData.tags?.length<1){
+            $('#tags').addClass('is-invalid');
+            $("#tags_error").text("You must add Tags this will occur big problem")
+
+
            }
             //  get array inputs of heads and contents
            if(formData.title == ""){
@@ -434,8 +439,8 @@
                $('textarea[name=contents]').removeClass('is-invalid');
                $('#contents_error').text('');
            }
-                  console.log($())
-           if(!formData.title||!formData.slug||!formData.meta_title||!formData.meta_description||!formData.meta_keywords||!formData.cannonical_url||!formData.schema||!formData.image){
+                  
+           if(!formData.title||!formData.slug||!formData.meta_title||!formData.meta_description||!formData.meta_keywords||!formData.cannonical_url||!formData.schema||!formData.image||formData.tags?.length<1){
                     // alert('All fields are required');
                        
                     let alert=`<x-adminlte-alert theme="danger" title="Danger">

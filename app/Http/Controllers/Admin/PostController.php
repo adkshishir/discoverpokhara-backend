@@ -187,10 +187,9 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
+        // dd($post->contents);
         $seo=Seo::where('post_id',$post->id)->first();
         $tags=TagPost::where('post_id',$post->id)->get();
-        $contents=Content::where('post_id',$post->id)->get();
-        
         $validator = Validator::make($request->all(), [
             'title' => 'required',
             'slug' => 'required',
@@ -223,7 +222,7 @@ class PostController extends Controller
             'cannonical_url'=>$request->cannonical_url
         ]);
         // delete previous tags
-          if(count($request->tags)>0){
+          if($request->tags&&count($request->tags)>0){
             if(count($tags)>0){
                 foreach ($tags as $tag) {
                     $tag->delete();
@@ -237,7 +236,7 @@ class PostController extends Controller
               }
           }
         // delete previous contents
-        foreach ($contents as $content) {
+        foreach ($post->contents as $content) {
             $special=SpecialSection::where('content_id',$content->id)->get();
              if(count($special)>0){
                 foreach($special as $value){
@@ -247,23 +246,32 @@ class PostController extends Controller
             }
             $content->delete();
         }
+        // create new contents
         for($i=0;$i<count($request->heads);$i++){
-            Content::create([
+           $cont= Content::create([
                 'post_id' => $post->id,
                 'title' => $request->heads[$i],
                 'content' => $request->contents[$i]
             ]);
-            if(isset($request->section_image[$i+1])){
-                $special=SpecialSection::create([
-                    'content_id'=>$content->id,
-                    'title'=>$request->section_head[$i+1]?:'-',
-                    'description'=>$request->section_description[$i+1]?:'-',
-                    'url'=>$request->section_url[$i+1]
-                ]);
-                if($request->hasFile('section_image') && $request->section_image[$i+1] != null){
-                    $special->addMedia($request->section_image[$i+1])->toMediaCollection('special_sections');
+            // dd($request->section_head);
+            if(isset($request->section_head[$i+1])){
+                 
+                foreach($request->section_head[$i+1] as $key=>$value){
+                      $special='';
+                        $value!=''&& $special= SpecialSection::create([
+                        'content_id'=>$cont->id,
+                        'name'=>$value,
+                        'image_name'=>$request->section_image[$i+1][$key]?:"-",
+                        'description'=>$request->section_description[$i+1][$key]?:"-",
+                        'url'=>$request->section_url[$i+1][$key]?:"-",
+                    ]);
+                    // save the image into the media library
+                    if(isset($request->section_image[$i+1][$key])){
+                        $special->addMedia($request->section_image[$i+1][$key])->toMediaCollection('special-section');
+                    }
                 }
             }
+         
 
         }
         if ($request->hasFile('image')) {

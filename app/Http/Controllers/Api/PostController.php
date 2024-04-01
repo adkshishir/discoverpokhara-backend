@@ -43,13 +43,20 @@ class PostController extends Controller
     public function show(string $slug)
     {
      try{
-        $post=Post::where('slug',$slug)->with(['seo','author','contents'=>function ($q){
+        $post=Post::where('slug',$slug)->select('id','title','slug','updated_at','category_id','author_id')->with(['tags','category'=>function ($q){$q->select('id','name','slug');},'seo','author','contents'=>function ($q){
          $q->with('special_sections');
         }])->first();
-        // $seo=Seo::where('parent_id',$post->id)->where('seo_type','post')->first();
-        // $author=Author::where('id',$post->author_id)->select('id', 'name', 'avatar')->first();
-        $relatedPost=Post::where('id','!=',$post->id)->where('author_id',$post->author_id)->latest()->take(7)->select('id','title','slug','image')->get();
-        
+        $image=$post->getMedia('posts')->first()?->getFullUrl();
+        $related=Post::where('id','!=',$post->id)->where('author_id',$post->author_id)->latest()->take(7)->select('id','title','slug','category_id')->get();
+        $relatedPost=[];
+        foreach($related as $key=>$rel){
+            $relatedPost[$key]['id']=$rel->id;
+            $relatedPost[$key]['title']=$rel->title;
+            $relatedPost[$key]['slug']=$rel->slug;
+            $relatedPost[$key]['image']=$rel->getMedia('posts')->first()?->getFullUrl();
+            $relatedPost[$key]['category']=$rel->category;
+            $relatedPost[$key]['tags']=$rel->tags->select('id','name','slug')->first();
+        }
         if(!$post){
             return response()->json([
                 'success'=>false,
@@ -58,9 +65,8 @@ class PostController extends Controller
             ],200);}
         $data = [
             'post' => $post,
-            // 'seo' => $seo,
-            // 'author' => $author,
-            'relatedPost' => $relatedPost
+            'relatedPost' => $relatedPost,
+            'image' => $image
         ];
        return response()->json([
          'success'=>true,
