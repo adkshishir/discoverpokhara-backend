@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+
 
 // category routes for backend
 
@@ -37,8 +37,18 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Route::get('admin/categories/{category}/edit', [CategoryController::class, 'edit'])->middleware('auth')->name('categories.edit');
 
 Route::middleware('auth')->prefix('admin')->group(function () {
+//   Route::group(['middleware' => 'admin'],function () {
+//     Route::resource('categories', CategoryController::class);
+//     Route::resource('posts',PostController::class);
+//     Route::resource('tags',TagsController::class);
+//     Route::resource('authors',AuthorController::class);
+//     });
+});
+Route::group(['middleware' => 'admin'],function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::resource('categories', CategoryController::class);
     Route::resource('posts',PostController::class);
     Route::resource('tags',TagsController::class);
     Route::resource('authors',AuthorController::class);
-});
+    });
