@@ -46,7 +46,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 });
 Route::group(['middleware' => 'admin'],function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
     Route::resource('categories', CategoryController::class);
     Route::resource('posts',PostController::class);
     Route::resource('tags',TagsController::class);

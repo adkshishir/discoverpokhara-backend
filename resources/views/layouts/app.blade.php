@@ -39,7 +39,7 @@
 
     <strong>
         <a href="{{ config('app.company_url', 'https://discoverpokhara.com') }}">
-            {{ config('app.company_name', 'Discover Pokhara') }}
+{{ config('app.company_name', 'Wander Pokhara') }}
         </a>
     </strong>
 @stop

@@ -60,15 +60,19 @@ $config = [
 @endphp
 
 {{-- Minimal example / fill data using the component slot --}}
-<x-adminlte-datatable id="table1" :heads="$heads">
-    @foreach($config['data'] as $row)
-    <tr>
-        @foreach($row as $cell)
-        <td>{!! $cell !!}</td>
-        @endforeach
-    </tr>
-    @endforeach
-</x-adminlte-datatable>
+<div class="container " style="" >
+    <div class=" p-2  rounded ">
+        <x-adminlte-datatable class="card rounded p-2" id="table1" :heads="$heads">
+            @foreach($config['data'] as $row)
+            <tr>
+                @foreach($row as $cell)
+                <td>{!! $cell !!}</td>
+                @endforeach
+            </tr>
+            @endforeach
+        </x-adminlte-datatable>
+    </div>
+</div>
 
 {{-- Compressed with style options / fill data using the plugin config
 <x-adminlte-datatable id="table2" :heads="$heads" head-theme="dark" :config="$config" striped hoverable bordered
