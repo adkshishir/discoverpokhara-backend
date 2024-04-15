@@ -16,14 +16,14 @@ return new class extends Migration
             $table->foreignId('post_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('tag_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('category_id')->nullable()->constrained()->onDelete('cascade');
-            $table->string('meta_title');
-            $table->text('meta_description');
-            $table->string('meta_keywords');
-            $table->string('cannonical_url');
+            $table->string('meta_title')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->string('meta_keywords')->nullable();
+            $table->string('cannonical_url')->nullable();
             $table->string('og_title')->nullable();
             $table->string('og_description')->nullable();
             $table->string('og_image')->nullable();
-            $table->longText('schema');
+            $table->longText('schema')->nullable();
             $table->timestamps();
         });
     }

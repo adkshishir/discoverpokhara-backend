@@ -18,7 +18,7 @@ class TagsController extends Controller
      */
     public function index()
     {
-        $tags=Tag::select('id','name','slug')->get();
+        $tags = Tag::select('id', 'title', 'slug')->get();
         $data=[
             'tags'=>$tags,
            
@@ -32,7 +32,7 @@ class TagsController extends Controller
     public function create()
     {
         $data=[];
-        $categories=Category::pluck('name','id');
+        $categories = Category::pluck('title', 'id');
         // dd($categories);
         $data=[
             'categories'=>$categories
@@ -46,26 +46,25 @@ class TagsController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            // 'title' => 'required',
             'category_id' => 'required',
-            'slug' => 'required|unique:categories,slug',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'description' => 'required',
-            'meta_title' => 'required',
-            'meta_description' => 'required',
-            'meta_keywords' => 'required',
-            'schema' => 'required',
-            'cannonical_url' => 'required|string|max:255',
+            // 'slug' => 'required|unique:categories,slug',
+            // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // 'description' => 'required',
+            // 'meta_title' => 'required',
+            // 'meta_description' => 'required',
+            // 'meta_keywords' => 'required',
+            // 'schema' => 'required',
+            // 'cannonical_url' => 'required|string|max:255',
         ]);
           if($validator->fails()){
               return redirect()->back()->withErrors($validator)->withInput();
           }
        $tag= Tag::create([
-            'name'=>$request->name,
+            'title' => $request->title,
             'slug'=>$request->slug,
             'category_id'=>$request->category_id,
             'description' => $request->description,
-            'image' => $request->image->getClientOriginalName(),
         ]);
         Seo::create([
             'tag_id'=>$tag->id,
@@ -98,7 +97,7 @@ class TagsController extends Controller
      */
     public function edit(Tag $tag)
     {
-        $categories=Category::pluck('name','id');
+        $categories = Category::pluck('title', 'id');
         if(!$tag){
             return redirect()->route('admin.tags.index',['error'=>'Tag not found']);
         }
@@ -120,16 +119,16 @@ class TagsController extends Controller
             return redirect()->route('admin.tags.index',['error'=>'Tag not found']);
         }
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            // 'name' => 'required',
             'category_id' => 'required',
-            'slug' => 'required',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'description' => 'required',
-            'meta_title' => 'required',
-            'meta_description' => 'required',
-            'meta_keywords' => 'required',
-            'schema' => 'required',
-            'cannonical_url' => 'required|string|max:255',
+            // 'slug' => 'required',
+            // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // 'description' => 'required',
+            // 'meta_title' => 'required',
+            // 'meta_description' => 'required',
+            // 'meta_keywords' => 'required',
+            // 'schema' => 'required',
+            // 'cannonical_url' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -139,7 +138,7 @@ class TagsController extends Controller
         }
      
         $tag->update([
-            'name'=>$request->name,
+            'title' => $request->title,
             'slug'=>$request->slug,
             'category_id'=>$request->category_id,
             'description' => $request->description,

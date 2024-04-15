@@ -19,7 +19,7 @@
 @php
 $heads = [
 'ID',
-'Name',
+'Title',
 ['label' => 'Slug', 'width' => 40],
 ['label' => 'Actions', 'no-export' => true, 'width' => 5],
 ];
@@ -30,9 +30,14 @@ $btnEdit = '<a href="#" class="btn btn-xs btn-default text-primary mx-1 shadow" 
     <i class="fa fa-lg fa-fw fa-pen"></i>
 </a>';
 
-$btnDelete = '<a class="btn btn-xs btn-default text-danger mx-1 shadow" title="Delete" data-id="' . $id . '">
-    <i class="fa fa-lg fa-fw fa-trash"></i>
-</a>';
+$btnDelete ='<form action="' . route('tags.destroy', $id) . '" method="POST">
+    <input type="hidden" name="_method" value="DELETE">
+    <input type="hidden" name="_token" value="' . csrf_token() . '">
+    <button type="submit" onclick="return confirm(\'Are you sure?\')"
+        class="btn btn-xs btn-default text-danger mx-1 shadow" title="Delete" data-id="' . $id . '">
+        <i class="fa fa-lg fa-fw fa-trash"></i>
+</button>
+</form>';
 
 $btnDetails = '<a class="btn btn-xs btn-default text-teal mx-1 shadow" title="Details" data-id="' . $id . '">
     <i class="fa fa-lg fa-fw fa-eye"></i>
@@ -46,7 +51,7 @@ $data=[];
 foreach ($tags as $key => $tag) {
 $data[] = [
 $tag->id,
-$tag->name,
+$tag->title,
 $tag->slug,
 "<div class=\"d-flex\">" . getActionButtons($tag->id) . "</div>",
 ];
@@ -87,7 +92,7 @@ $config = [
     $(document).on('click', 'a[title="Edit"]', function(e) {
         e.preventDefault();
         var id = $(this).data('id');
-        location.href = '/admin/tags/' + id + '/edit'; 
+location.href = '/tags/' + id + '/edit';
     });
 });
 </script>

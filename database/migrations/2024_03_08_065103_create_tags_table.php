@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('tags', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('slug');
-            $table->string('description');
+            $table->string('title')->nullable()->default('');
+            $table->string('slug')->nullable()->default('');
+            $table->string('description')->nullable()->default('');
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->string('image')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

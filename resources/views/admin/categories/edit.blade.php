@@ -52,7 +52,7 @@
             </div>
             <div class="row">
                   <div class="col-md-6">
-                    <x-adminlte-input value="{{ $category->name}}" name="name" label="Name" placeholder="Enter name" fgroup-class=""
+<x-adminlte-input value="{{ $category->title}}" name="title" label="Title" placeholder="Enter title" fgroup-class=""
                      >
                      <x-slot  name='buttomsSlot'>    
                       <div id="title_error" class="text-danger">this is error</div>
@@ -76,7 +76,8 @@
                  
                   <div class="col-md-12">
                     <div class="container">
-                      <img id="imagepreview" class="w-25   mt-2" style="object-fit: cover;height: 200px"   src="{{$image->getUrl()}}" alt="">
+                <img id="imagepreview" class="w-25   mt-2" style="object-fit: cover;max-height: 200px" src="{{$image?->getUrl()}}"
+                        alt="">
                     </div>
                     
                       <div>
@@ -89,7 +90,8 @@
 
             </div>
            
-            <x-adminlte-button onclick="return validateForm()" class="btn-flat  mt-4" type="submit" label="Submit" theme="success" icon="fas fa-lg fa-save " />
+<x-adminlte-button {{-- onclick="return validateForm()" --}} class="btn-flat  mt-4" type="submit" label="Submit"
+                theme="success" icon="fas fa-lg fa-save " />
         </form>
     </div>
 </div>

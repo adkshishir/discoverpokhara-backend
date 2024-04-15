@@ -10,7 +10,7 @@ class Tag extends BaseModel
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'title',
         'slug',
         'description',
         'category_id',

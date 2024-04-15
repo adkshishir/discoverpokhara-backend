@@ -16,6 +16,7 @@ $heads = [
 'Title',
 // ['label' => 'Image', 'width' => 40],
 'slug',
+'status',
 ['label' => 'Actions', 'no-export' => true, 'width' => 5],
 ];
 
@@ -25,9 +26,14 @@ $btnEdit = '<a href="#" class="btn btn-xs btn-default text-primary mx-1 shadow" 
     <i class="fa fa-lg fa-fw fa-pen"></i>
 </a>';
 
-$btnDelete = '<a class="btn btn-xs btn-default text-danger mx-1 shadow" title="Delete" data-id="' . $id . '">
-    <i class="fa fa-lg fa-fw fa-trash"></i>
-</a>';
+$btnDelete = '<form action="' . route('posts.destroy', $id) . '" method="POST">
+    <input type="hidden" name="_method" value="DELETE">
+    <input type="hidden" name="_token" value="' . csrf_token() . '">
+    <button type="submit" onclick="return confirm(\'Are you sure?\')"
+        class="btn btn-xs btn-default text-danger mx-1 shadow" title="Delete" data-id="' . $id . '">
+        <i class="fa fa-lg fa-fw fa-trash"></i>
+</button>
+</form>';
 
 $btnDetails = '<a class="btn btn-xs btn-default text-teal mx-1 shadow" title="Details" data-id="' . $id . '">
     <i class="fa fa-lg fa-fw fa-eye"></i>
@@ -41,6 +47,7 @@ $data[] = [
 $post->id,
 $post->title,
 $post->slug,
+$post->is_published,
 "<div class=\"d-flex\">" . getActionButtons($post->id) . "</div>",
 
 
@@ -84,7 +91,7 @@ $config = [
     $(document).on('click', 'a[title="Edit"]', function(e) {
         e.preventDefault();
         var id = $(this).data('id');
-        location.href = '/admin/posts/' + id + '/edit';
+location.href = '/posts/' + id + '/edit';
         
     });
 
@@ -102,7 +109,7 @@ $config = [
         var id = $(this).data('id');
         // Perform details action for the record with the provided ID
         console.log('View details for record with ID:', id);
-        location.href = '/admin/posts/' + id + '/show';
+location.href = '/posts/' + id + '/show';
 
     });
 });

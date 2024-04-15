@@ -71,7 +71,7 @@
                 ];
                 @endphp
                 <div class="col-md-6">
-                    <x-adminlte-select2 id="Tag" name="category_id" label="Category" label-class="" igroup-size="sm"
+<x-adminlte-select2 id="Tag" name="category_id" label="Category *" label-class="" igroup-size="sm"
                         :config="$config">
                         <x-slot name="prependSlot">
                             <div class="input-group-text bg-primary">
@@ -91,7 +91,7 @@
                     </x-adminlte-select2>
                 </div>
                 <div class="col-md-6">
-                    <x-adminlte-select2 id="tags" name="tags[]" label="Tags" label-class="" igroup-size="sm"
+<x-adminlte-select2 id="tags" name="tags[]" label="Tags *" label-class="" igroup-size="sm"
                         :config="$config" multiple>
                         <x-slot name="prependSlot">
                             <div class="input-group-text bg-primary">
@@ -128,52 +128,49 @@
                     @endphp
 
                     <div class="container-fluid  w-full">
-                          
-                             @foreach($post->contents as $key=>$content)
-                         <div class="container-fluid">
+@foreach($post->contents as $key=>$content)
+<div class="container-fluid">
                             <div class="form-group w-full">
-                                <x-adminlte-input class="col-12" name='heads[]' label="Header" placeholder="Enter header"
+<x-adminlte-input class="col-12" name='heads[]' label="Header" placeholder="Enter header"
                                     value="{{ $content->title }}" />
                                 <x-adminlte-text-editor class="col-12" id="content{{$key}}" name="contents[]" rows='7'
                                     label="Content" label-class="" igroup-size="sm" placeholder="Main Content..."
                                     :config="$config">{{ $content->content }}</x-adminlte-text-editor>
                             </div>
-                            <button class="btn btn-danger remove-input" type="button" id="remove-content">Remove</button>
-    
+<button class="btn btn-danger remove-input" type="button" id="remove-content">Remove</button>
                             <div id="section" class="w-100 row container m-5 rounded p-2 mx-auto special-section"
                                 style="background-color: aliceblue">
                                 <h3 class="col-12">Special Section</h3>
-    
-    
+
                                 {{-- special section start --}}
-    
+
                                 @isset($content->special_sections)
                                 @foreach($content->special_sections as $sectionIndex=>$section)
-                                    
+
                                 <div
                                     class="container border rounded p-3 m-2 col-md-5 mx-auto bg-secondary  special-section-box">
-                                    <x-adminlte-input class="col-12" value="{{$section->name}}" name="section_head[{{$sectionIndex}}][]" label="Header"
+<x-adminlte-input class="col-12" value="{{$section->name}}" name="section_head[{{$sectionIndex}}][]" label="Header"
                                         placeholder="Enter section header" />
-                                    <x-adminlte-input class="col-12" value="{{$section->description}}" name="section_description[{{$sectionIndex}}][]"
+<x-adminlte-input class="col-12" value="{{$section->description}}" name="section_description[{{$sectionIndex}}][]"
                                         label="Description" placeholder="Enter section description" />
                                     <x-adminlte-input class="col-12" value="{{$section->url}}" name="section_url[{{$sectionIndex}}][]" label="Url"
                                         placeholder="Enter section Url" />
-    
-                                    <x-adminlte-input type="file" class="col-12" name='section_image[{{$sectionIndex}}][]'
-                                        label="Section Image" placeholder="Enter section Image" />
+
+<x-adminlte-input type="file" class="col-12" name='section_image[{{$sectionIndex}}][]' label="Section Image"
+                                        placeholder="Enter section Image" />
                                     <button type="button" class="btn btn-danger float-right remove-section">Remove
                                         Section</button>
                                 </div>
                                 @endforeach
                                 @endisset
                                 {{-- special section end --}}
-                                
+
                                 <button type="button" id="add-section" class="btn col-12  add-section">
                                     <span class="btn btn-primary">Add Section</span></button>
                             </div>
-                         </div>
+</div>
                         @endforeach
-                          
+
 
                         <button id="add-more" class="col-2 float-right btn btn-primary add-more mx-2 " type="button">Add
                             More</button>
@@ -184,11 +181,11 @@
 
                 <div class="col-md-12">
                     {{-- With label and feedback disabled --}}
-                    <img src={{$image->getUrl()}} alt="this is iamge" id="imagepreview" class="w-25">
+                    <img src={{$image?->getUrl()}} alt="this is iamge" id="imagepreview" class="w-25">
                     <div>
 
                         <label for="image" class="form-label">Image</label>
-                        <input class="form-control form-control-lg" value="{{ $image->getUrl() }}" id="image"
+                        <input class="form-control form-control-lg" value="{{ $image?->getUrl() }}" id="image"
                             type="file" placeholder="" name="image">
                     </div>
                     {{--
@@ -301,16 +298,16 @@
                  
     });
      
-// track submit button before submit
-$(document).on('submit', 'form', function(e) {
-    if(document.getElementById("seo").style.display === "none"){
-        e.preventDefault(); 
-        document.getElementById("general").style.display = "none";
-         document.getElementById("seo").style.display = "flex";
-         $('#submit-button').text('Submit')
-         return false
-      }
-});
+// // track submit button before submit
+// $(document).on('submit', 'form', function(e) {
+// if(document.getElementById("seo").style.display === "none"){
+// e.preventDefault();
+// document.getElementById("general").style.display = "none";
+// document.getElementById("seo").style.display = "flex";
+// $('#submit-button').text('Submit')
+// return false
+// }
+// });
 
 
 

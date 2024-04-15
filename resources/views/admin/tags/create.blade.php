@@ -52,7 +52,7 @@
       </div>
       <div class="row">
         <div class="col-md-6">
-          <x-adminlte-input value="{{ old('name') }}" name="name" label="Name" placeholder="Enter name"
+<x-adminlte-input value="{{ old('title') }}" name="title" label="Title" placeholder="Enter name"
             fgroup-class="" />
 
         </div>
@@ -62,7 +62,7 @@
         </div>
         
         <div class="col-md-12">
-          <x-adminlte-select name="category_id" label="Parent">
+<x-adminlte-select name="category_id" label="Parent *" fgroup-class="" required>
             @if(old('category_id'))
             <option value="{{old('category_id')}}">{{$categories[old('category_id')]}}</option>
             @endif

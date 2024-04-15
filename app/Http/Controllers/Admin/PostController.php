@@ -25,7 +25,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $post = Post::select('id','title','slug')->get();  
+        $post = Post::select('id', 'title', 'slug', 'is_published')->get();
         $data = [
             'posts' => $post
         ];
@@ -38,8 +38,8 @@ class PostController extends Controller
     public function create()
     {
         $data = [];
-        $category = Category::all()->pluck('name', 'id');
-        $tag = Tag::pluck('name', 'id');
+        $category = Category::all()->pluck('title', 'id');
+        $tag = Tag::pluck('title', 'id');
         $data = [
             'categories' => $category,
             'tags' => $tag
@@ -55,38 +55,40 @@ class PostController extends Controller
     {
         //  dd($request->all());
         $validator = Validator::make($request->all(), [
-            'title' => 'required',
+            // 'title' => 'required',
             // 'slug' => 'required|unique:posts,slug',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'slug' => 'required',
+            // 'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // 'slug' => 'required',
             'category_id' => 'required|exists:categories,id',
             'tags' => 'required|array|exists:tags,id',
-            'meta_title' => 'required',
-            'meta_description' => 'required',
-            'meta_keywords' => 'required',
-            'heads' => 'required',
-            'contents' => 'required',
-            'section_head'=>'array',
-            'section_head.*' => 'required',
-            'section_description'=>'array',
-            'section_description.*' => 'required',
-            'section_image'=>'array',
-            'section_image.*' => 'required',
-            'section_url'=>'array',
-            'section_url.*' => 'required',
+            // 'meta_title' => 'required',
+            // 'meta_description' => 'required',
+            // 'meta_keywords' => 'required',
+            // 'heads' => 'required',
+            // 'contents' => 'required',
+            // 'section_head'=>'array',
+            // 'section_head.*' => 'required',
+            // 'section_description'=>'array',
+            // 'section_description.*' => 'required',
+            // 'section_image'=>'array',
+            // 'section_image.*' => 'required',
+            // 'section_url'=>'array',
+            // 'section_url.*' => 'required',
             
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
             
         }
-        
+        // dd($request->is_published);
         $author=Author::where('user_id',auth()->user()->id)->first();
         $post = Post::create([
             'title' => $request->title,
             'slug' => $request->slug,
             'author_id' => $author->id,
             'category_id' => $request->category_id,
+            'is_published' => $request->is_published,
+            'h1' => $request->h1,
             'publication_date'=>Carbon::now()->format('Y-m-d '),
 
         ]);
@@ -113,7 +115,7 @@ class PostController extends Controller
           $content=  Content::create([
                 'post_id' => $post->id,
                 'title' => $request->heads[$i],
-                'content' => $request->contents[$i]?:"-",
+                'content' => $request->contents[$i] ?: "",
             ]);
               if(isset($request->section_head[$i+1])){
             foreach($request->section_head[$i+1] as $key=>$value){
@@ -122,8 +124,8 @@ class PostController extends Controller
                     $value!=''&& $special= SpecialSection::create([
                     'content_id'=>$content->id,
                     'name'=>$value,
-                    'image_name'=>$request->section_image[$i+1][$key]?:"-",
-                    'description'=>$request->section_description[$i+1][$key]?:"-",
+                        // 'image_name'=>$request->section_image[$i+1][$key]?:"",
+                        'description' => $request->section_description[$i + 1][$key] ?: "",
                     'url'=>$request->section_url[$i+1][$key]?:"-",
                 ]);
                 // save the image into the media library
@@ -143,8 +145,8 @@ class PostController extends Controller
     public function show(string $id)
     {
         $post = Post::find($id);
-        $category = Category::all()->pluck('name', 'id');
-        $tag = Tag::pluck('name', 'id');
+        $category = Category::all()->pluck('title', 'id');
+        $tag = Tag::pluck('title', 'id');
        $image=$post->getMedia()->first();
         $data = [
             'post' => $post,
@@ -160,9 +162,9 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        try{      
-        $category = Category::all()->pluck('name', 'id');
-        $tag = Tag::pluck('name', 'id');
+        try {
+            $category = Category::all()->pluck('title', 'id');
+            $tag = Tag::pluck('title', 'id');
         $image=$post->getMedia("posts")->first();
         
         if(!$post){
@@ -191,14 +193,15 @@ class PostController extends Controller
         $seo=Seo::where('post_id',$post->id)->first();
         $tags=TagPost::where('post_id',$post->id)->get();
         $validator = Validator::make($request->all(), [
-            'title' => 'required',
-            'slug' => 'required',
+            // 'title' => 'required',
+            // 'slug' => 'required',
             'category_id' => 'required|exists:categories,id',
-            'meta_title' => 'required',
-            'meta_description' => 'required',
-            'meta_keywords' => 'required',
-            'heads' => 'required',
-            'contents' => 'required',
+            // 'meta_title' => 'required',
+            // 'meta_description' => 'required',
+            // 'meta_keywords' => 'required',
+            // 'heads' => 'required',
+            // 'contents' => 'required',
+
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -210,6 +213,8 @@ class PostController extends Controller
             'slug' => $request->slug,
             'author_id' => $author->id,
             'category_id' => $request->category_id,
+            'is_published' => $request->is_published,
+            'h1' => $request->h1,
             'publication_date'=>Carbon::now()->format('Y-m-d '),
 
         ]);
@@ -261,8 +266,8 @@ class PostController extends Controller
                         $value!=''&& $special= SpecialSection::create([
                         'content_id'=>$cont->id,
                         'name'=>$value,
-                        'image_name'=>$request->section_image[$i+1][$key]?:"-",
-                        'description'=>$request->section_description[$i+1][$key]?:"-",
+                        'image_name' => $request->section_image[$i + 1][$key] ?: "",
+                        'description' => $request->section_description[$i + 1][$key] ?: "",
                         'url'=>$request->section_url[$i+1][$key]?:"-",
                     ]);
                     // save the image into the media library

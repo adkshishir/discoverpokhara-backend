@@ -10,7 +10,7 @@ class Category extends BaseModel
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'title',
         'slug',
         'description',
     ];

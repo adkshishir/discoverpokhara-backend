@@ -81,6 +81,15 @@
                         </x-slot>
                     </x-adminlte-input>
 
+</div>
+<div class="col-md-6">
+    <x-adminlte-input value="{{ old('h1') }}" name="h1" label="H1" placeholder="Enter H1" fgroup-class="">
+        <x-slot name="bottomSlot">
+            <span id="title_error" class="text-sm text-danger">
+
+            </span>
+        </x-slot>
+    </x-adminlte-input>
                 </div>
                 <div class="col-md-6">
                     <x-adminlte-input value="{{ old('slug') }}" name="slug" label="Slug" placeholder="Slug..."
@@ -91,7 +100,13 @@
                             </span>
                         </x-slot>
                     </x-adminlte-input>
-
+</div>
+<div class="col-md-6">
+    <label for="is_published">Status</label>
+    <select name="is_published" class="form-control" id="is_published">
+        <option value="published">Published</option>
+        <option value="draft">Draft</option>
+    </select>
 
                 </div>
                 @php
@@ -102,7 +117,7 @@
                 ];
                 @endphp
                 <div class="col-md-6">
-                    <x-adminlte-select2 id="Tag" name="category_id" label="Category" label-class="" igroup-size="sm"
+<x-adminlte-select2 id="Tag" required name="category_id" label="Category *" label-class="" igroup-size="sm"
                         :config="$config">
                         <x-slot name="prependSlot">
                             <div class="input-group-text bg-primary">
@@ -117,7 +132,7 @@
                         </x-slot>
                         @if(old('category_id'))
                         <option value="{{ old('category_id') }}">{{ $categories[old('category_id')] }}</option>
-                       
+
                         @endif
                         @isset($categories)
                         @foreach($categories as $id=>$value)
@@ -129,7 +144,7 @@
 
                 </div>
                 <div class="col-md-6">
-                    <x-adminlte-select2 id="tags" name="tags[]" label="Tags" label-class="" igroup-size="sm"
+<x-adminlte-select2 id="tags" required name="tags[]" label="Tags *" label-class="" igroup-size="sm"
                         :config="$config" multiple>
                         <x-slot name="prependSlot">
                             <div class="input-group-text bg-primary">
@@ -203,7 +218,7 @@
 
             </div>
 
-            <x-adminlte-button onclick="return validateForm()" id="submit-button" id="submit-button"
+<x-adminlte-button {{-- onclick="return validateForm()" --}} id="submit-button" id="submit-button"
                 class="btn-flat rounded mt-4" type="submit" label="Submit" theme="success" icon="fas fa-lg fa-save " />
         </form>
     </div>

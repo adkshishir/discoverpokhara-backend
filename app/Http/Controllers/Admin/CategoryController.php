@@ -17,7 +17,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories=Category::select('id','name','slug')->get();
+        $categories = Category::select('id', 'title', 'slug')->get();
         $data=[
             'categories'=>$categories,   
         ];
@@ -39,7 +39,7 @@ class CategoryController extends Controller
     {
         
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'title' => 'string',
             'slug' => 'required|unique:categories,slug',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'description' => 'required',
@@ -49,15 +49,14 @@ class CategoryController extends Controller
             'schema' => 'required',
             'cannonical_url' => 'required|string|max:255',
         ]);
-        if ($validator->fails()) {
-            return redirect('admin/categories/create')
-                        ->withErrors($validator)
-                        ->withInput($request->all());
-        }
+        // if ($validator->fails()) {
+        //     return redirect('admin/categories/create')
+        //                 ->withErrors($validator)
+        //                 ->withInput($request->all());
+        // }
         $category=Category::create([
-            "name"=>$request->name,
-            "slug"=>$request->slug,
-            'image' => $request->image->getClientOriginalName(),
+            "title" => $request->title,
+            "slug" => $request->slug,
             'description' => $request->description,
 
         ]);
@@ -120,7 +119,7 @@ class CategoryController extends Controller
             return redirect()->route('categories.index',['error'=>'Category not found']);
         }
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'title' => 'required',
             'slug' => 'required',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'meta_title' => 'required',
@@ -129,13 +128,13 @@ class CategoryController extends Controller
             'schema' => 'required',
         ]);
 
-        if ($validator->fails()) {
-            return redirect('admin/category/'.$category->id.'/edit')
-                        ->withErrors($validator)
-                        ->withInput();
-        }
+        // if ($validator->fails()) {
+        //     return redirect('admin/category/'.$category->id.'/edit')
+        //                 ->withErrors($validator)
+        //                 ->withInput();
+        // }
         $category->update([
-            "name"=>$request->name,
+            "title" => $request->title,
             "slug"=>$request->slug,
             'description' => $request->description,
         ]);
@@ -159,9 +158,9 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         if(!$category){
-            return redirect()->route('admin.categories.index',['error'=>'Category not found']);
+            return redirect()->route('categories.index', ['error' => 'Category not found']);
         }
         $category->delete();
-        return redirect()->route('admin.categories.index',['success'=>'Category deleted successfully']);
+        return redirect()->route('categories.index', ['success' => 'Category deleted successfully']);
     }
 }

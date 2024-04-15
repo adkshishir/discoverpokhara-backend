@@ -53,7 +53,7 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <x-adminlte-input value="{{ $tag->name}}" name="name" label="Name" placeholder="Enter name"
+<x-adminlte-input value="{{ $tag->title}}" name="title" label="Title" placeholder="Enter name"
                         fgroup-class="" />
 
                 </div>
@@ -69,7 +69,7 @@
                         <option value="{{ $key }}">{{ $category }}</option>
                         @endif
                         @endforeach
-                      </x-adminlte-select>
+</x-adminlte-select>
                 </div>
 
                 <div class="col-md-12">
@@ -84,7 +84,8 @@
 
                 <div class="col-md-12">
                     <div class="container">
-                        <img id="imagepreview" class="w-25   mt-2" style="object-fit: cover;height: 200px"   src="{{$image->getUrl()}}" alt="">
+<img id="imagepreview" class="w-25   mt-2" style="object-fit: cover;max-height: 200px" src="{{$image?->getUrl()}}"
+    alt="">
                     </div>
 
                     <div>
