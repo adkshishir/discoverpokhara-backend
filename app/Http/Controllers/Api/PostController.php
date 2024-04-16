@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 class PostController extends Controller
 {
     public function index(){
-        $posts=Post::select('id','title','slug','image','author_id')->get();
+        $posts=Post::select('id','title','slug','author_id')->get();
         $postWithImage=[];
         foreach($posts as $post){
             $postWithImage[]=[
@@ -43,10 +43,16 @@ class PostController extends Controller
     public function show(string $slug)
     {
      try{
-        $post=Post::where('slug',$slug)->select('id','title','slug','updated_at','category_id','author_id')->with(['tags','category'=>function ($q){$q->select('id','name','slug');},'seo','author','contents'=>function ($q){
+            $post = Post::where('slug', $slug)->select('id', 'title', 'h1', 'is_published', 'slug', 'updated_at', 'category_id', 'author_id')->with([
+                'tags',
+                'category' => function ($q) {
+                    $q->select('id', 'title', 'slug'); },
+                'seo',
+                'author',
+                'contents' => function ($q) {
          $q->with('special_sections');
         }])->first();
-        $image=$post->getMedia('posts')->first()?->getFullUrl();
+        $image=$post?->getMedia('posts')?->first()?->getFullUrl();
         $related=Post::where('id','!=',$post->id)->where('author_id',$post->author_id)->latest()->take(7)->select('id','title','slug','category_id')->get();
         $relatedPost=[];
         foreach($related as $key=>$rel){
@@ -55,7 +61,7 @@ class PostController extends Controller
             $relatedPost[$key]['slug']=$rel->slug;
             $relatedPost[$key]['image']=$rel->getMedia('posts')->first()?->getFullUrl();
             $relatedPost[$key]['category']=$rel->category;
-            $relatedPost[$key]['tags']=$rel->tags->select('id','name','slug')->first();
+                $relatedPost[$key]['tags'] = $rel->tags->select('id', 'title', 'slug')->first();
         }
         if(!$post){
             return response()->json([

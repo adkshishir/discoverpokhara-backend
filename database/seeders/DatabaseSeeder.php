@@ -29,12 +29,12 @@ class DatabaseSeeder extends Seeder
     {
         User::create([
             'name' => 'Sailesh Pokhara',
-            'email' => 'wanderpokhara@gmailcom',
+            'email' => 'wanderpokhara@gmail.com',
             'password' => Hash::make('saileshpokhara'),
             'role' => 'admin',
             'email_verified_at' => now(),
         ]);
-        Author::factory(1)->create();
+        // Author::factory(1)->create();
         // User::factory(1)->create();
         // Author::factory(1)->create();
         // Category::factory(6)->create();
@@ -46,10 +46,10 @@ class DatabaseSeeder extends Seeder
         // Seo::factory(100)->create();
         // Comment::factory(1000)->create();
         // FlashNew::factory(3)->create();
-        // User::first()->update([
-        //     'email' => 'wanderpokhara@gmailcom',
-        //     'password' => Hash::make('saileshpokhara'),
-        // ]);
+        User::first()->update([
+            'email' => 'wanderpokhara@gmail.com',
+            'password' => Hash::make('saileshpokhara'),
+        ]);
         Author::first()->update([
             'user_id' => User::first()->id
         ]);

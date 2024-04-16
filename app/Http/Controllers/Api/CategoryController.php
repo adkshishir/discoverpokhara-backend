@@ -16,14 +16,14 @@ class CategoryController extends Controller
    public function index(){
    try{
     
-    $categories = Category::select('id','name','slug','image')->with(['posts','tags'])->get();
+    $categories = Category::select('id','title','slug')->with(['posts','tags'])->get();
     $tempCategorys=[];
     foreach($categories as $key=>$category){
         $tempCategorys[$key]['id']=$category->id;
-        $tempCategorys[$key]['name']=$category->name;
+        $tempCategorys[$key]['title']=$category->name;
         $tempCategorys[$key]['slug']=$category->slug;
         $tempCategorys[$key]['image']=$category->getMedia('categories')?->first()?->getFullUrl();
-        $tempCategorys[$key]['tag']=$category->tags->select('id','name','slug')->first();
+        $tempCategorys[$key]['tag']=$category->tags->select('id','title','slug')->first();
          foreach($category->posts as $key1=>$post){
             $tempCategorys[$key]['posts'][$key1]['id']=$post->id;
             $tempCategorys[$key]['posts'][$key1]['title']=$post->title;
@@ -56,8 +56,8 @@ class CategoryController extends Controller
 }
 public function show(string $slug){
          $category=Category::where('slug',$slug)->with(['seo','posts'])->get()->first();
-         $posts=Post::where('category_id',$category->id)->select('id','title','slug','image','updated_at','author_id')->with(['comments','author','tags'=>function($q){$q->select('name','slug')->first();}])->latest()->paginate(10);
-         $popular=Post::where('category_id',$category->id)->select('id','title','slug','image','updated_at')->with(['tags'=>function($q){$q->select('name','slug')->first();}])->withCount('comments')->orderBy('comments_count','desc')->limit(5)->get();
+         $posts=Post::where('category_id',$category->id)->select('id','title','slug','updated_at','author_id')->with(['comments','author','tags'=>function($q){$q->select('title','slug')->first();}])->latest()->paginate(10);
+         $popular=Post::where('category_id',$category->id)->select('id','title','slug','updated_at')->with(['tags'=>function($q){$q->select('title','slug')->first();}])->withCount('comments')->orderBy('comments_count','desc')->limit(5)->get();
          $postsWithImage=Helper::dataWithImage($posts,'posts');
          $popularWithImage=Helper::dataWithImage($popular,'posts');
          if($category){

@@ -15,9 +15,9 @@ class HomeController extends Controller
     public function index(){
         try{
          $menuData=[];
-         $categorys=Category::select('id','name','slug')->with(['posts'])->get();
-         $recentPost=Post::select('id','title','slug','image','author_id','category_id')->with(['author','tags','category'=>function ($q){$q->select('id','name','slug');}])->latest()->limit(6)->get();
-         $popularPost=Post::select('id','title','slug','image','author_id','category_id')->with(['author','tags','category'=>function ($q){$q->select('id','name','slug');}])->withCount('comments')->orderBy('comments_count','desc')->limit(6)->get();
+         $categorys=Category::select('id','title','slug')->with(['posts'])->get();
+         $recentPost=Post::select('id','title','slug','author_id','category_id')->with(['author','tags','category'=>function ($q){$q->select('id','title','slug');}])->latest()->limit(6)->get();
+         $popularPost=Post::select('id','title','slug','author_id','category_id')->with(['author','tags','category'=>function ($q){$q->select('id','title','slug');}])->withCount('comments')->orderBy('comments_count','desc')->limit(6)->get();
          $flashNews=FlashNew::select('id','title','link')->latest()->limit(4)->get();
          $recentPostWithImage=Helper::dataWithImage($recentPost,'posts');
          $popularPostWithImage=Helper::dataWithImage($popularPost,'posts');
@@ -30,7 +30,7 @@ class HomeController extends Controller
             ],200);
         }
         foreach($categorys as $key=>$category){
-            $menuData[$key]['name']=$category->name;
+            $menuData[$key]['title']=$category->title;
             $menuData[$key]['slug']=$category->slug;
 
             if(!$category->posts){
@@ -40,7 +40,7 @@ class HomeController extends Controller
             foreach($category->posts as $key1=>$post){
                 $menuData[$key]['posts'][$key1]['title']=$post->title;
                 $menuData[$key]['posts'][$key1]['slug']=$post->slug;
-                $menuData[$key]['tags']=$post->tags->select('id','name','slug')->first();
+                $menuData[$key]['tags']=$post->tags->select('id','title','slug')->first();
                 
             }
         }

@@ -6,7 +6,6 @@ use App\Models\Author;
 use App\Models\Category;
 use App\Models\Tag;
 use Illuminate\Database\Eloquent\Factories\Factory;
-
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Post>
  */
@@ -25,7 +24,9 @@ class PostFactory extends Factory
             'author_id' => Author::all()->random()->id,
             'category_id' => Category::all()->random()->id,
             'publication_date' => $this->faker->date(),
-            'image' => $this->faker->imageUrl,
+            //    random element from an array
+            'is_published' => $this->faker->randomElement(['published', 'draft']),
+            'h1' => $this->faker->sentence(),
         ];
     }
 }

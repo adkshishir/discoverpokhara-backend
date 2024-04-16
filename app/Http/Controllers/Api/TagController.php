@@ -13,11 +13,12 @@ use Illuminate\Http\Request;
 class TagController extends Controller
 {
     public function index(){
-    $tags=Tag::select('id','name','slug','category_id')->with(['category'=>function ($q){
-        $q->select('id','name','slug');
+        $tags = Tag::select('id', 'title', 'slug', 'category_id')->with([
+            'category' => function ($q) {
+                $q->select('id', 'title', 'slug');
     },
         'posts' => function ($query) {
-            $query->select( 'title', 'slug','image');
+                $query->select('title', 'slug');
         }
     ])->latest()->get();
     if($tags){
@@ -36,16 +37,16 @@ class TagController extends Controller
     }
 }
     public function show(string $slug){
-         $tag=Tag::where('slug',$slug)->select('id', 'name', 'slug')->with(['seo',])->get()->first();
+         $tag=Tag::where('slug',$slug)->select('id', 'title', 'slug')->with(['seo',])->get()->first();
          $posts=Post::whereHas('tags', function ($q) use ($tag) {
              $q->where('tag_id', $tag->id);
 
-         })->with(['category'=>function($q){$q->select('id','name','slug');},'author'=>function($q){$q->select('id','name');}])->latest()->paginate(10);
+         })->with(['category'=>function($q){$q->select('id','title','slug');},'author'=>function($q){$q->select('id','name');}])->latest()->paginate(10);
             $postsWithImage=Helper::dataWithImage($posts,'posts');
          $popular=Post::whereHas('tags', function ($q) use ($tag) {
              $q->where('tag_id', $tag->id);
 
-         })->with(['category'=>function($q){$q->select('id','name','slug');},'author'=>function($q){$q->select('id','name');}])->withCount('comments')->orderBy('comments_count','desc')->limit(5)->get();
+         })->with(['category'=>function($q){$q->select('id','title','slug');},'author'=>function($q){$q->select('id','name');}])->withCount('comments')->orderBy('comments_count','desc')->limit(5)->get();
          $popularWithImage=Helper::dataWithImage($popular,'posts');
          
         if($tag){
