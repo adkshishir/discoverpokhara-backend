@@ -20,7 +20,7 @@ class CategoryController extends Controller
     $tempCategorys=[];
     foreach($categories as $key=>$category){
         $tempCategorys[$key]['id']=$category->id;
-        $tempCategorys[$key]['title']=$category->name;
+                $tempCategorys[$key]['title'] = $category->title;
         $tempCategorys[$key]['slug']=$category->slug;
         $tempCategorys[$key]['image']=$category->getMedia('categories')?->first()?->getFullUrl();
         $tempCategorys[$key]['tag']=$category->tags->select('id','title','slug')->first();

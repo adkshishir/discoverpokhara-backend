@@ -59,8 +59,26 @@
 
                 </div>
                 <div class="col-md-6">
+                    <x-adminlte-input value="{{ old('h1') }}" name="h1" label="H1" placeholder="Enter H1"
+                        fgroup-class="">
+                        <x-slot name="bottomSlot">
+                            <span id="title_error" class="text-sm text-danger">
+
+                            </span>
+                        </x-slot>
+                    </x-adminlte-input>
+                </div>
+                <div class="col-md-6">
                     <x-adminlte-input value="{{ $post->slug }}" name="slug" label="Slug" placeholder="Slug..."
                         fgroup-class="" />
+
+                </div>
+                <div class="col-md-6">
+                    <label for="is_published">Status</label>
+                    <select name="is_published" class="form-control" id="is_published">
+                        <option value="published">Published</option>
+                        <option value="draft">Draft</option>
+                    </select>
 
                 </div>
                 @php
@@ -71,7 +89,7 @@
                 ];
                 @endphp
                 <div class="col-md-6">
-<x-adminlte-select2 id="Tag" name="category_id" label="Category *" label-class="" igroup-size="sm"
+                    <x-adminlte-select2 id="Tag" name="category_id" label="Category *" label-class="" igroup-size="sm"
                         :config="$config">
                         <x-slot name="prependSlot">
                             <div class="input-group-text bg-primary">
@@ -91,7 +109,7 @@
                     </x-adminlte-select2>
                 </div>
                 <div class="col-md-6">
-<x-adminlte-select2 id="tags" name="tags[]" label="Tags *" label-class="" igroup-size="sm"
+                    <x-adminlte-select2 id="tags" name="tags[]" label="Tags *" label-class="" igroup-size="sm"
                         :config="$config" multiple>
                         <x-slot name="prependSlot">
                             <div class="input-group-text bg-primary">
@@ -128,16 +146,17 @@
                     @endphp
 
                     <div class="container-fluid  w-full">
-@foreach($post->contents as $key=>$content)
-<div class="container-fluid">
+                        @foreach($post->contents as $key=>$content)
+                        <div class="container-fluid">
                             <div class="form-group w-full">
-<x-adminlte-input class="col-12" name='heads[]' label="Header" placeholder="Enter header"
-                                    value="{{ $content->title }}" />
+                                <x-adminlte-input class="col-12" name='heads[]' label="Header"
+                                    placeholder="Enter header" value="{{ $content->title }}" />
                                 <x-adminlte-text-editor class="col-12" id="content{{$key}}" name="contents[]" rows='7'
                                     label="Content" label-class="" igroup-size="sm" placeholder="Main Content..."
                                     :config="$config">{{ $content->content }}</x-adminlte-text-editor>
                             </div>
-<button class="btn btn-danger remove-input" type="button" id="remove-content">Remove</button>
+                            <button class="btn btn-danger remove-input" type="button"
+                                id="remove-content">Remove</button>
                             <div id="section" class="w-100 row container m-5 rounded p-2 mx-auto special-section"
                                 style="background-color: aliceblue">
                                 <h3 class="col-12">Special Section</h3>
@@ -149,14 +168,18 @@
 
                                 <div
                                     class="container border rounded p-3 m-2 col-md-5 mx-auto bg-secondary  special-section-box">
-<x-adminlte-input class="col-12" value="{{$section->name}}" name="section_head[{{$sectionIndex}}][]" label="Header"
+                                    <x-adminlte-input class="col-12" value="{{$section->name}}"
+                                        name="section_head[{{$sectionIndex}}][]" label="Header"
                                         placeholder="Enter section header" />
-<x-adminlte-input class="col-12" value="{{$section->description}}" name="section_description[{{$sectionIndex}}][]"
-                                        label="Description" placeholder="Enter section description" />
-                                    <x-adminlte-input class="col-12" value="{{$section->url}}" name="section_url[{{$sectionIndex}}][]" label="Url"
+                                    <x-adminlte-input class="col-12" value="{{$section->description}}"
+                                        name="section_description[{{$sectionIndex}}][]" label="Description"
+                                        placeholder="Enter section description" />
+                                    <x-adminlte-input class="col-12" value="{{$section->url}}"
+                                        name="section_url[{{$sectionIndex}}][]" label="Url"
                                         placeholder="Enter section Url" />
 
-<x-adminlte-input type="file" class="col-12" name='section_image[{{$sectionIndex}}][]' label="Section Image"
+                                    <x-adminlte-input type="file" class="col-12"
+                                        name='section_image[{{$sectionIndex}}][]' label="Section Image"
                                         placeholder="Enter section Image" />
                                     <button type="button" class="btn btn-danger float-right remove-section">Remove
                                         Section</button>
@@ -168,7 +191,7 @@
                                 <button type="button" id="add-section" class="btn col-12  add-section">
                                     <span class="btn btn-primary">Add Section</span></button>
                             </div>
-</div>
+                        </div>
                         @endforeach
 
 

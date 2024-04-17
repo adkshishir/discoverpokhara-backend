@@ -12,13 +12,15 @@ use Illuminate\Http\Request;
 class PostController extends Controller
 {
     public function index(){
-        $posts=Post::select('id','title','slug','author_id')->get();
+        $posts = Post::select('id', 'title', 'h1', 'is_published', 'slug', 'author_id')->get();
         $postWithImage=[];
         foreach($posts as $post){
             $postWithImage[]=[
                 'id'=>$post->id,
                 'title'=>$post->title,
                 'slug'=>$post->slug,
+                'h1' => $post->h1,
+                'is_published' => $post->is_published,
                 'image'=>$post->getMedia('image')->first(),
                 'author_id'=>$post->author_id
             ];

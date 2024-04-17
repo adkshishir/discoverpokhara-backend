@@ -13,6 +13,8 @@ class Post extends BaseModel
         'author_id',
         'publication_date',
         'slug',
+        'h1',
+        'is_published',
         'category_id',
     ];
     // set publication date automatically
