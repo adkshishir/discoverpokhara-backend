@@ -169,7 +169,9 @@
                     "height" => "300",
                     "toolbar" => [
                     // [groupName, [list of button]]
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    // headings of the summer note editor
+                    ['heading', ['style']],
+                    ['style', [ 'bold', 'italic', 'underline', 'clear']],
                     ['font', ['strikethrough', 'superscript', 'subscript']],
                     ['fontsize', ['fontsize']],
                     ['color', ['color']],
@@ -241,7 +243,7 @@
             }
             reader.readAsDataURL(this.files[0]);
         });
-        
+
     let contentSection=[]
     $(document).ready(function() {
      $('#submit-button').text('Next')
@@ -267,7 +269,7 @@
                 <x-adminlte-input class="col-12" name='heads[]' label="Header" placeholder="Enter header" />
                 <x-adminlte-text-editor class="col-12" id="content${count}" name="contents[]" rows='7' label="Content" label-class=""
                     igroup-size="sm" placeholder="Main Content..." :config="$config" />
-                   
+
                     <button type="button" class="btn btn-danger remove-input">Remove</button>
                     <div id="section${count}" class="w-100 row container m-5 rounded p-2 mx-auto special-section" style="background-color: aliceblue">
                             <h3 class="col-12">Special Section</h3>
@@ -277,14 +279,17 @@
                         </div>
                 </div>
             `
-                  
+
             $('#add-more').before(inputGroup);
                 // Apply configuration to the newly added text editor
                 let newEditorConfig = {
                     "height": "300",
                     "width": "100%",
                     "toolbar": [
+                    ['heading', ['style']],
+
                         ['style', ['bold', 'italic', 'underline', 'clear']],
+
                         ['font', ['strikethrough', 'superscript', 'subscript']],
                         ['fontsize', ['fontsize']],
                         ['color', ['color']],
@@ -307,7 +312,7 @@
         $(this).closest('.special-section-box').remove();
     });
 
-     
+
 // track submit button before submit
 
  $(document).on('click', '.add-section', function() {
@@ -320,7 +325,7 @@
                                         placeholder="Enter section description" />
                                     <x-adminlte-input class="col-12" name='section_url[${sectionIndex}][]' label="Url"
                                         placeholder="Enter section Url" />
-                                        
+
                                     <x-adminlte-input type="file" class="col-12" name='section_image[${sectionIndex}][]'
                                         label="Section Image" placeholder="Enter section Image" />
                                         <button type="button" class="btn btn-danger float-right remove-section">Remove Section</button>
@@ -328,11 +333,11 @@
                                 `;
                 $(this).before(sectionbox)
 
-                 
+
     })
 
 
-// form validation 
+// form validation
      function validateForm(){
         //   return false
         if(document.getElementById("seo").style.display === "none"){
@@ -430,7 +435,7 @@
            }else{
                $('textarea[name=schema]').removeClass('is-invalid');
                $('#schema_error').text('');
-           } 
+}
            if(formData.image == ""){
                $('input[name=image]').addClass('is-invalid');
                 $('#image_error').text('Image is required');
@@ -455,10 +460,10 @@
                $('textarea[name=contents]').removeClass('is-invalid');
                $('#contents_error').text('');
            }
-                  
+
            if(!formData.title||!formData.slug||!formData.meta_title||!formData.meta_description||!formData.meta_keywords||!formData.cannonical_url||!formData.schema||!formData.image||formData.tags?.length<1){
                     // alert('All fields are required');
-                       
+
                     let alert=`<x-adminlte-alert theme="danger" title="Danger">
                                     All fields are required!
                                     </x-adminlte-alert>`

@@ -36,7 +36,7 @@ $btnDelete ='<form action="' . route('tags.destroy', $id) . '" method="POST">
     <button type="submit" onclick="return confirm(\'Are you sure?\')"
         class="btn btn-xs btn-default text-danger mx-1 shadow" title="Delete" data-id="' . $id . '">
         <i class="fa fa-lg fa-fw fa-trash"></i>
-</button>
+    </button>
 </form>';
 
 $btnDetails = '<a class="btn btn-xs btn-default text-teal mx-1 shadow" title="Details" data-id="' . $id . '">
@@ -67,15 +67,15 @@ $config = [
 <div class="p-2 container">
     {{-- <div class="card p-2 h3">All Tags</div> --}}
     {{-- Minimal example / fill data using the component slot --}}
-<x-adminlte-datatable class="card rounded p-2" id="table1" :heads="$heads">
-    @foreach($config['data'] as $row)
-    <tr>
-        @foreach($row as $cell)
-        <td>{!! $cell !!}</td>
+    <x-adminlte-datatable class="card rounded p-2" id="table1" :heads="$heads">
+        @foreach($config['data'] as $row)
+        <tr>
+            @foreach($row as $cell)
+            <td>{!! $cell !!}</td>
+            @endforeach
+        </tr>
         @endforeach
-    </tr>
-    @endforeach
-</x-adminlte-datatable>
+    </x-adminlte-datatable>
 </div>
 
 {{-- Compressed with style options / fill data using the plugin config
@@ -86,7 +86,6 @@ $config = [
 
 @push('js')
 <script>
-  
     $(document).ready(function() {
     // Handle edit button click
     $(document).on('click', 'a[title="Edit"]', function(e) {

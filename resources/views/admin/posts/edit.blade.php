@@ -132,6 +132,7 @@
                     "height" => "300",
                     "toolbar" => [
                     // [groupName, [list of button]]
+                    ['heading', ['style']],
                     ['style', ['bold', 'italic', 'underline', 'clear']],
                     ['font', ['strikethrough', 'superscript', 'subscript']],
                     ['fontsize', ['fontsize']],
@@ -246,7 +247,7 @@
   $(document).ready(function() {
     $('#general').css({display:'flex'});
     $('#seo').css({display:'none'});
-   
+
     let count=1
     $(document).on('click', '.add-more', function() {
         count=count+1
@@ -255,7 +256,7 @@
                 <x-adminlte-input class="col-12" name='heads[]' label="Header" placeholder="Enter header" />
                 <x-adminlte-text-editor class="col-12" id="content${count}" name="contents[]" rows='7' label="Content" label-class=""
                     igroup-size="sm" placeholder="Main Content..." :config="$config" />
-                   
+
                     <button type="button" class="btn btn-danger remove-input">Remove</button>
                     <div id="section${count}" class="w-100 row container m-5 rounded p-2 mx-auto special-section" style="background-color: aliceblue">
                             <h3 class="col-12">Special Section</h3>
@@ -273,6 +274,7 @@
                     "height": "300",
                     "width": "100%",
                     "toolbar": [
+                         ['heading', ['style']],
                         ['style', ['bold', 'italic', 'underline', 'clear']],
                         ['font', ['strikethrough', 'superscript', 'subscript']],
                         ['fontsize', ['fontsize']],
@@ -290,7 +292,7 @@
     $(document).on('click', '.remove-input', function() {
         $(this).closest('.container-fluid').remove();
     });
-    
+
     $(document).on('click', '.remove-section', function() {
         $(this).closest('.special-section-box').remove();
     });
@@ -298,7 +300,7 @@
 
 
     // add new section to the nearest position
-    
+
  $(document).on('click', '.add-section', function() {
           let  sectionIndex= $(this).closest('.special-section').index()-1;
           console.log(sectionIndex)
@@ -310,7 +312,7 @@
                                         placeholder="Enter section description" />
                                     <x-adminlte-input class="col-12" name='section_url[${sectionIndex}][]' label="Url"
                                         placeholder="Enter section Url" />
-                                        
+
                                     <x-adminlte-input type="file" class="col-12" name='section_image[${sectionIndex}][]'
                                         label="Section Image" placeholder="Enter section Image" />
                                         <button type="button" class="btn btn-danger float-right remove-section">Remove Section</button>
@@ -318,9 +320,9 @@
                                 `;
                 $(this).before(sectionbox)
 
-                 
+
     });
-     
+
 // // track submit button before submit
 // $(document).on('submit', 'form', function(e) {
 // if(document.getElementById("seo").style.display === "none"){
